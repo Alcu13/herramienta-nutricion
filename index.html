@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Herramienta de Nutrición Deportiva</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f5f3ee;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo {
+      font-size: 52px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 40px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 20px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      border: 2px solid transparent;
+      transition: border-color .2s, transform .15s, box-shadow .2s;
+    }
+    .card:hover {
+      border-color: #7aab8a;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px rgba(0,0,0,.12);
+    }
+    .card-icon { font-size: 38px; margin-bottom: 14px; }
+    .card h2 { font-size: 16px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px; }
+    .card p { font-size: 13px; color: #888; line-height: 1.5; }
+    .card-badge {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+    .badge-blue  { background: #e8f4fd; color: #1565c0; }
+    .badge-green { background: #e8f5e9; color: #2e7d32; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🥗</div>
+    <h1>Nutrición Deportiva</h1>
+    <p class="subtitle">Herramienta de planificación nutricional personalizada</p>
+    <div class="cards">
+      <a class="card" href="Formulario.html">
+        <div class="card-icon">📋</div>
+        <h2>Cuestionario</h2>
+        <p>Formulario de evaluación inicial para el paciente</p>
+        <span class="card-badge badge-blue">Para el paciente</span>
+      </a>
+      <a class="card" href="Procesador.html">
+        <div class="card-icon">🧑‍⚕️</div>
+        <h2>Procesador</h2>
+        <p>Análisis del cuestionario y creación del plan nutricional</p>
+        <span class="card-badge badge-green">Para el nutricionista</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Datos de pacientes (sensibles)
+datos_paciente_*.json
+*.json
+
+# Archivos Excel y de trabajo
+Valores.xlsx
+Seguimiento.xlsm
+*.xlsm
+*.xlsx
+
+# PDFs
+*.pdf
+
+# Archivos internos de desarrollo
+CLAUDE.md
+food_db_names.txt
+excel_foods.txt
+*.txt
+
+# Sistema
+.DS_Store
+Thumbs.db

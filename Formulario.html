@@ -1,0 +1,3936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario Inicial | Plan Nutricional Personalizado</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --sage: #3d6b4f;
+    --sage-light: #5a8a6a;
+    --sage-pale: #eaf2ec;
+    --amber: #c8763a;
+    --amber-light: #f0e6d8;
+    --cream: #faf8f4;
+    --white: #ffffff;
+    --ink: #1e2820;
+    --gray: #6b7b70;
+    --gray-light: #e8ede9;
+    --border: #d4ddd6;
+    --shadow: rgba(61, 107, 79, 0.12);
+    --red: #c0392b;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 10% 20%, rgba(61,107,79,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(200,118,58,0.05) 0%, transparent 50%);
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--sage);
+    padding: 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(200,118,58,0.15);
+  }
+  .header-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .progress-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    transition: color .3s;
+  }
+  .progress-label.active { color: var(--sage); }
+  .progress-bar-track {
+    height: 4px;
+    background: var(--gray-light);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage), var(--sage-light));
+    border-radius: 99px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+    width: 12.5%;
+  }
+  .progress-text {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── STEP ── */
+  .step { display: none !important; animation: fadeUp .4s ease; }
+  .step.active { display: block !important; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .step-num {
+    width: 48px; height: 48px;
+    background: var(--sage);
+    color: #fff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .step-desc {
+    font-size: 14px;
+    color: var(--gray);
+    margin-top: 2px;
+    line-height: 1.5;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 16px var(--shadow);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--amber-light);
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.cols-1 { grid-template-columns: 1fr; }
+  @media(max-width: 600px) {
+    .form-grid, .form-grid.cols-3 { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1/-1; }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  label .req { color: var(--amber); margin-left: 2px; }
+  label .hint { 
+    font-weight: 400; 
+    color: var(--gray); 
+    font-size: 12px; 
+    display: block;
+    margin-top: 2px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    width: 100%;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(61,107,79,0.12);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7b70' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+
+  /* ── RADIO / CHECK PILLS ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .pill-group input { display: none; }
+  .pill-group label {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    transition: all .2s;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill-group input:checked + label {
+    border-color: var(--sage);
+    background: var(--sage);
+    color: #fff;
+  }
+  .pill-group label:hover { border-color: var(--sage-light); color: var(--sage); }
+  .pill-group input:checked + label:hover { color: #fff; }
+
+  /* ── ACTIVITY BLOCK ── */
+  .activity-block {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    background: var(--sage-pale);
+    position: relative;
+  }
+  .activity-block .remove-btn {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray);
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background .2s, color .2s;
+  }
+  .activity-block .remove-btn:hover { background: rgba(192,57,43,0.1); color: var(--red); }
+
+  .add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: var(--sage-pale);
+    border: 1.5px dashed var(--sage-light);
+    border-radius: 10px;
+    color: var(--sage);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    margin-top: 8px;
+  }
+  .add-btn:hover { background: var(--sage); color: #fff; border-style: solid; }
+
+  /* ── INGESTA BLOCK ── */
+  .ingesta-block {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 160px auto;
+    align-items: center;
+    gap: 12px;
+  }
+  .ingesta-block select, .ingesta-block input { margin: 0; }
+  @media(max-width: 600px) { .ingesta-block { grid-template-columns: 1fr; } }
+
+  /* ── MEAL TIME BADGE ── */
+  .meal-time-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--sage);
+    color: #fff;
+    border-radius: 99px;
+    padding: 4px 12px 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .meal-time-badge input[type="time"] {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    width: 90px;
+    padding: 0;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    color-scheme: dark;
+  }
+
+  /* ── SPORT SEARCHABLE COMBOBOX ── */
+  .sport-search-wrap { position: relative; }
+  .sport-search-input {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px 11px 38px;
+    width: 100%;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' stroke='%236b7b70' stroke-width='2'/%3E%3Cpath d='m21 21-4-4' stroke='%236b7b70' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+  }
+  .sport-search-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(61,107,79,.12); background-color: #fff; }
+  .sport-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: #fff; border: 1.5px solid var(--border); border-radius: 10px;
+    max-height: 240px; overflow-y: auto; z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  .sport-cat-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--amber); padding: 8px 14px 4px; background: var(--amber-light);
+    position: sticky; top: 0;
+  }
+  .sport-option {
+    padding: 9px 14px; font-size: 13px; cursor: pointer;
+    transition: background .15s; color: var(--ink);
+  }
+  .sport-option:hover { background: var(--sage-pale); color: var(--sage); }
+  .sport-option-empty { padding: 12px 14px; font-size: 13px; color: var(--gray); font-style: italic; }
+
+  /* ── DAY-TYPE BUILDER ── */
+  .dt-add-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .dt-add-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700;
+    padding: 8px 14px; border-radius: 99px;
+    border: 1.5px solid; cursor: pointer;
+    transition: all .2s; background: #fff;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .dt-block {
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
+    border: 2px solid var(--border); background: var(--white);
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .dt-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .dt-badge {
+    font-size: 11px; font-weight: 800; letter-spacing: .5px;
+    color: #fff; padding: 5px 12px; border-radius: 99px; white-space: nowrap;
+  }
+  .dt-nombre {
+    flex: 1; min-width: 180px;
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 7px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: var(--cream); outline: none; transition: border-color .2s;
+  }
+  .dt-nombre:focus { border-color: var(--sage); }
+  .dt-ingesta-row {
+    display: grid; grid-template-columns: 1fr 120px 32px;
+    gap: 8px; align-items: center; margin-bottom: 6px;
+  }
+  .dt-ingesta-tipo {
+    font-family: 'Nunito', sans-serif; font-size: 13px;
+    padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: var(--cream); outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7b70' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
+  .dt-ingesta-hora {
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--sage);
+    background: var(--sage-pale); outline: none; color: var(--sage); text-align: center;
+  }
+  .dt-ingesta-remove {
+    width: 30px; height: 30px; border-radius: 8px; border: none;
+    background: var(--gray-light); color: var(--gray); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .dt-ingesta-remove:hover { background: rgba(192,57,43,.1); color: var(--red); }
+  @media(max-width:600px) { .dt-ingesta-row { grid-template-columns: 1fr 100px 30px; } }
+
+  /* ── GANTT ── */
+  .gantt-wrap {
+    background: #fff; border-radius: 12px; border: 1.5px solid var(--border);
+    padding: 20px; margin-bottom: 20px; page-break-inside: avoid;
+  }
+  .gantt-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600;
+    color: var(--sage); margin-bottom: 4px;
+  }
+  .gantt-subtitle { font-size: 12px; color: var(--gray); margin-bottom: 14px; }
+  .gantt-grid { position: relative; }
+  .gantt-hour-header { display: flex; align-items: center; margin-bottom: 4px; }
+  .gantt-lbl-col { width: 160px; flex-shrink: 0; }
+  .gantt-hours-col { flex: 1; position: relative; height: 16px; }
+  .gantt-row-wrap { display: flex; align-items: center; margin-bottom: 5px; }
+  .gantt-row-lbl {
+    width: 160px; flex-shrink: 0; font-size: 11px; font-weight: 700;
+    color: var(--ink); padding-right: 8px; line-height: 1.3;
+  }
+  .gantt-bar-area {
+    flex: 1; height: 26px; background: #f5f7f5;
+    border-radius: 5px; overflow: hidden; position: relative;
+    border: 1px solid var(--border);
+  }
+  .gantt-block {
+    position: absolute; top: 0; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; overflow: hidden; border-right: 1px solid rgba(255,255,255,.4);
+  }
+  .gantt-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .gantt-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--gray); }
+  .gantt-legend-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── RANGE SLIDER ── */
+  .range-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .range-wrap input[type="range"] {
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    cursor: pointer;
+    accent-color: var(--sage);
+    height: auto;
+  }
+  .range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); }
+
+  /* ── DAYS OF WEEK ── */
+  .days-check { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .days-check input { display: none; }
+  .days-check label {
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    color: var(--gray);
+  }
+  .days-check input:checked + label { background: var(--sage); border-color: var(--sage); color: #fff; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--amber-light);
+    border-left: 3px solid var(--amber);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #5c3d1a;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .info-box strong { color: var(--amber); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+    gap: 12px;
+  }
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-back {
+    background: var(--cream);
+    color: var(--gray);
+    border: 1.5px solid var(--border);
+  }
+  .btn-back:hover { background: var(--gray-light); }
+  .btn-next {
+    background: var(--sage);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(61,107,79,0.3);
+  }
+  .btn-next:hover { background: var(--sage-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(61,107,79,0.35); }
+  .btn-submit {
+    background: var(--amber);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(200,118,58,0.35);
+  }
+  .btn-submit:hover { background: #b3662e; transform: translateY(-1px); }
+
+  /* ── SUMMARY ── */
+  #summary-view { display: none; }
+  .summary-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .summary-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--sage);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--sage-pale);
+  }
+  .summary-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-light);
+    font-size: 14px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: var(--gray); font-weight: 600; }
+  .summary-val { color: var(--ink); }
+
+  .success-banner {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
+    border-radius: 16px;
+    padding: 36px;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 28px;
+  }
+  .success-banner h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  .success-banner p { font-size: 15px; opacity: .85; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+
+  .print-btn {
+    background: var(--ink);
+    color: #fff;
+    padding: 13px 28px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    transition: all .2s;
+  }
+  .print-btn:hover { background: #333; }
+
+  /* ── ENVÍO PDF ── */
+  .envio-wrap {
+    text-align: center;
+    margin-top: 28px;
+  }
+  .btn-enviar {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 36px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 24px rgba(61,107,79,0.35);
+    transition: all .25s;
+  }
+  .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(61,107,79,0.4); }
+  .btn-enviar:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+  .envio-panel {
+    display: none;
+    background: var(--white);
+    border: 1.5px solid var(--sage-pale);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-top: 24px;
+    text-align: left;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .envio-panel.visible { display: block; animation: fadeUp .4s ease; }
+  .envio-panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--sage);
+    font-weight: 600;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .envio-steps { display: flex; flex-direction: column; gap: 14px; }
+  .envio-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .envio-step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .envio-step-num.done { background: var(--sage); color: #fff; }
+  .envio-step-num.pending { background: var(--amber); color: #fff; }
+  .envio-step-num.waiting { background: var(--gray-light); color: var(--gray); }
+  .envio-step-body { font-size: 14px; line-height: 1.6; padding-top: 4px; }
+  .envio-step-body strong { color: var(--ink); }
+  .envio-step-body span { color: var(--gray); font-size: 13px; display: block; margin-top: 2px; }
+
+  .btn-open-mail {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 24px;
+    background: var(--amber);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    box-shadow: 0 4px 16px rgba(200,118,58,0.3);
+    transition: all .2s;
+  }
+  .btn-open-mail:hover { background: #b3662e; transform: translateY(-1px); }
+
+  /* ── PDF-ONLY HEADER (only visible inside generated PDF) ── */
+  #pdf-header { display: none; }
+
+  @media print {
+    /* Hide everything except the PDF content */
+    body > *:not(#pdf-print-wrapper) { display: none !important; }
+    #pdf-print-wrapper { display: block !important; }
+    @page { margin: 8mm; size: A4 portrait; }
+  }
+
+  /* ── SPORT SEARCH ── */
+  .sport-search-wrap { position: relative; }
+  .sport-search-input {
+    width: 100%;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .sport-search-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(61,107,79,0.12); background:#fff; }
+  .sport-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #fff;
+    border: 1.5px solid var(--sage);
+    border-radius: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .sport-group-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    padding: 8px 12px 4px;
+    background: var(--gray-light);
+  }
+  .sport-option {
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+    color: var(--ink);
+  }
+  .sport-option:hover { background: var(--sage-pale); color: var(--sage); font-weight: 600; }
+  .sport-selected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--sage);
+    color: #fff;
+    border-radius: 99px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 6px;
+    cursor: pointer;
+  }
+  .sport-selected-badge:hover { background: var(--sage-light); }
+
+  /* ── WEEK BUILDER ── */
+  .semana-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media(max-width:640px) { .semana-grid { grid-template-columns: 1fr; } }
+  .dia-card {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color .2s;
+  }
+  .dia-card:hover { border-color: var(--sage-light); }
+  .dia-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dia-badge {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--sage);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .dia-nombre {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .dia-section-lbl {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 5px;
+  }
+  .dia-ref {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 28px;
+    padding: 6px;
+    background: var(--gray-light);
+    border-radius: 8px;
+  }
+  .dia-ref-empty {
+    font-size: 11px;
+    color: var(--gray);
+    font-style: italic;
+  }
+  .dia-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .dia-meals { display: flex; flex-direction: column; gap: 5px; }
+  .dia-meal-row {
+    display: grid;
+    grid-template-columns: 1fr 96px auto;
+    gap: 6px;
+    align-items: center;
+  }
+  .dia-meal-row select,
+  .dia-meal-row input[type="time"] {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 8px;
+    background: var(--cream);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .dia-meal-row select:focus,
+  .dia-meal-row input[type="time"]:focus { border-color: var(--sage); background: #fff; }
+  .dia-meal-remove {
+    background: none; border: none; font-size: 15px;
+    color: var(--gray); cursor: pointer; padding: 2px 4px;
+    border-radius: 5px; transition: all .15s;
+  }
+  .dia-meal-remove:hover { background: rgba(192,57,43,.1); color: var(--red); }
+  .dia-add-meal {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 5px 12px; border-radius: 7px;
+    border: 1.5px dashed var(--sage-light);
+    background: var(--sage-pale); color: var(--sage);
+    cursor: pointer; transition: all .2s; align-self: flex-start;
+    margin-top: 2px;
+  }
+  .dia-add-meal:hover { background: var(--sage); color: #fff; border-style: solid; }
+
+  .dia-similares-banner {
+    display: none;
+    background: #fff8e6;
+    border: 1.5px solid var(--amber);
+    border-radius: 9px;
+    padding: 7px 11px;
+    font-size: 11px;
+    color: #7a4010;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .dia-similares-banner.visible { display: block; }
+  .dia-similares-banner strong { color: var(--amber); }
+  .dia-copy-btn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--amber);
+    background: #fff8e6;
+    color: #7a4010;
+    cursor: pointer;
+    transition: all .2s;
+    margin-top: 4px;
+  }
+  .dia-copy-btn.visible { display: inline-flex; }
+  .dia-copy-btn:hover { background: var(--amber); color: #fff; }
+  .dia-card.similar-highlight { border-color: var(--amber); }
+  .semana-refresh-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 20px; border-radius: 10px;
+    background: var(--amber-light); border: 1.5px solid var(--amber);
+    color: #7a4010; cursor: pointer; transition: all .2s; margin-bottom: 4px;
+  }
+  .semana-refresh-btn:hover { background: var(--amber); color: #fff; }
+
+  /* ── DAY TYPE BLOCKS (legacy, kept for JS) ── */
+  .dt-add-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .dt-add-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 99px;
+    border: 1.5px solid;
+    background: #fff;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .dt-add-btn:hover { color: #fff !important; filter: brightness(.85); }
+  .dt-block {
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 2px solid;
+    background: #fff;
+    position: relative;
+  }
+  .dt-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .dt-tag {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .dt-name-input {
+    flex: 1;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    background: var(--cream);
+    min-width: 140px;
+  }
+  .dt-remove-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--gray);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all .2s;
+  }
+  .dt-remove-btn:hover { background: rgba(192,57,43,0.1); color: var(--red); }
+  .dt-days { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .dt-days input { display: none; }
+  .dt-days label {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; border: 1.5px solid var(--border);
+    font-size: 11px; font-weight: 700; cursor: pointer; color: var(--gray);
+    transition: all .15s; background: var(--cream);
+  }
+  .dt-days input:checked + label { color: #fff; border-color: transparent; }
+  .dt-meals-container { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .dt-meal-row {
+    display: grid;
+    grid-template-columns: 1fr 110px auto;
+    gap: 8px;
+    align-items: center;
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+  }
+  .dt-meal-row select, .dt-meal-row input[type="time"] {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 10px;
+    background: #fff;
+    outline: none;
+  }
+  .dt-meal-row select:focus, .dt-meal-row input[type="time"]:focus { border-color: var(--sage); }
+  .dt-meal-remove {
+    background: none; border: none; font-size: 16px; color: var(--gray);
+    cursor: pointer; padding: 2px 5px; border-radius: 5px; transition: all .15s;
+  }
+  .dt-meal-remove:hover { background: rgba(192,57,43,0.1); color: var(--red); }
+  .dt-add-meal-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 6px 14px; border-radius: 8px; border: 1.5px dashed;
+    background: #fff; cursor: pointer; transition: all .2s;
+    margin-top: 4px;
+  }
+
+  /* ── COMIDAS HABITUALES ── */
+  .meal-card {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    background: var(--sage-pale);
+  }
+  .meal-card-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--sage);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .meal-icon { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <p class="header-eyebrow">Nutrición Personalizada</p>
+  <h1 class="header-title">Cuestionario Inicial</h1>
+  <p class="header-sub">Completa este formulario con la mayor precisión posible. Toda la información será usada para diseñar tu plan nutricional personalizado.</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-labels">
+    <span class="progress-label active" id="pl-1">Datos</span>
+    <span class="progress-label" id="pl-2">Salud</span>
+    <span class="progress-label" id="pl-3">Rutina</span>
+    <span class="progress-label" id="pl-4">Ingestas</span>
+    <span class="progress-label" id="pl-5">Alimentos</span>
+    <span class="progress-label" id="pl-6">Comidas</span>
+    <span class="progress-label" id="pl-7">Objetivos</span>
+    <span class="progress-label" id="pl-8">Extras</span>
+  </div>
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+  <p class="progress-text" id="progress-text">Paso 1 de 8</p>
+</div>
+
+<main class="main">
+
+<!-- ══════════════════════════════════════════════
+     PASO 1 — DATOS PERSONALES
+════════════════════════════════════════════════ -->
+<section class="step active" id="step-1">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div>
+      <div class="step-title">Datos Personales</div>
+      <div class="step-desc">Información básica para calcular tus necesidades energéticas</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Identificación</div>
+    <div class="form-grid">
+      <div class="field full">
+        <label>Nombre completo <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Ej. María García López">
+      </div>
+      <div class="field">
+        <label>Fecha de nacimiento <span class="req">*</span></label>
+        <input type="date" id="fecha_nac">
+      </div>
+      <div class="field">
+        <label>Edad <span class="hint">Se calculará automáticamente</span></label>
+        <input type="number" id="edad" placeholder="Años" readonly style="background:#f5f5f5;color:#999">
+      </div>
+      <div class="field">
+        <label>Email de contacto</label>
+        <input type="email" id="email" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <input type="tel" id="telefono" placeholder="+34 600 000 000">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Medidas y Composición</div>
+    <div class="form-grid cols-3">
+      <div class="field">
+        <label>Talla <span class="req">*</span><span class="hint">cm</span></label>
+        <input type="number" id="talla" placeholder="Ej. 175" min="100" max="230">
+      </div>
+      <div class="field">
+        <label>Peso actual <span class="req">*</span><span class="hint">kg</span></label>
+        <input type="number" id="peso" placeholder="Ej. 72.5" step="0.1" min="30" max="300">
+      </div>
+      <div class="field">
+        <label>Peso objetivo <span class="hint">kg (si lo conoces)</span></label>
+        <input type="number" id="peso_objetivo" placeholder="Ej. 68" step="0.1" min="30" max="300">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>Sexo <span class="req">*</span></label>
+      <div class="pill-group">
+        <input type="radio" name="sexo" id="sexo-h" value="Hombre"><label for="sexo-h">♂ Hombre</label>
+        <input type="radio" name="sexo" id="sexo-m" value="Mujer"><label for="sexo-m">♀ Mujer</label>
+        <input type="radio" name="sexo" id="sexo-o" value="Otro"><label for="sexo-o">Otro</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div></div>
+    <button class="btn btn-next" onclick="goStep(2)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 2 — ESTADO DE SALUD
+════════════════════════════════════════════════ -->
+<section class="step" id="step-2" style="display:none">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div>
+      <div class="step-title">Estado de Salud</div>
+      <div class="step-desc">Información médica relevante para personalizar tu plan nutricional</div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>Confidencialidad:</strong> toda la información que compartas será tratada con absoluta confidencialidad y solo será utilizada para elaborar tu plan nutricional.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Condiciones Médicas</div>
+    <div class="form-grid cols-1">
+
+      <!-- Enfermedades -->
+      <div class="field">
+        <label>¿Tienes alguna enfermedad, patología o condición médica diagnosticada?</label>
+        <div class="pill-group">
+          <input type="radio" name="enfermedad_yn" id="enf-si" value="Sí" onchange="toggleCondicional('enf-si','enf-det')">
+          <label for="enf-si">✅ Sí</label>
+          <input type="radio" name="enfermedad_yn" id="enf-no" value="No" onchange="toggleCondicional('enf-si','enf-det')">
+          <label for="enf-no">❌ No</label>
+        </div>
+      </div>
+      <div id="enf-det" style="display:none" class="field">
+        <label>¿Cuál o cuáles?
+          <span class="hint">Diabetes, hipertensión, hipotiroidismo, SII, PCOS, etc.</span>
+        </label>
+        <textarea id="enfermedades" placeholder="Ej: Hipotiroidismo controlado con medicación, síndrome de intestino irritable, diabetes tipo 2…" style="min-height:80px"></textarea>
+      </div>
+
+      <!-- Medicamentos -->
+      <div class="field">
+        <label>¿Tomas actualmente algún medicamento o suplemento?</label>
+        <div class="pill-group">
+          <input type="radio" name="medicamento_yn" id="med-si" value="Sí" onchange="toggleCondicional('med-si','med-det')">
+          <label for="med-si">✅ Sí</label>
+          <input type="radio" name="medicamento_yn" id="med-no" value="No" onchange="toggleCondicional('med-si','med-det')">
+          <label for="med-no">❌ No</label>
+        </div>
+      </div>
+      <div id="med-det" style="display:none" class="field">
+        <label>¿Cuáles? Indica nombre y dosis si la conoces</label>
+        <textarea id="medicamentos" placeholder="Ej: Metformina 850 mg, Vitamina D 2000 UI, Omega-3 1 g, píldora anticonceptiva…" style="min-height:80px"></textarea>
+      </div>
+
+      <!-- Análisis -->
+      <div class="field">
+        <label>¿Has realizado análisis de sangre recientes (últimos 6 meses)?</label>
+        <div class="pill-group">
+          <input type="radio" name="analisis_yn" id="an-si" value="Sí" onchange="toggleCondicional('an-si','an-det')">
+          <label for="an-si">✅ Sí</label>
+          <input type="radio" name="analisis_yn" id="an-no" value="No" onchange="toggleCondicional('an-si','an-det')">
+          <label for="an-no">❌ No</label>
+        </div>
+      </div>
+      <div id="an-det" style="display:none" class="field">
+        <label>¿Qué parámetros aparecen alterados o son relevantes?
+          <span class="hint">Colesterol, glucosa, ferritina, vitamina D, TSH…</span>
+        </label>
+        <textarea id="analisis_resultado" placeholder="Ej: Vitamina D baja (18 ng/ml), colesterol LDL elevado (160 mg/dl), ferritina en el límite inferior…" style="min-height:80px"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Historial Dietético</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Has seguido alguna dieta o plan nutricional anteriormente?</label>
+        <div class="pill-group">
+          <input type="radio" name="dieta_previa_yn" id="dp-si" value="Sí" onchange="toggleCondicional('dp-si','dp-det')">
+          <label for="dp-si">✅ Sí</label>
+          <input type="radio" name="dieta_previa_yn" id="dp-no" value="No" onchange="toggleCondicional('dp-si','dp-det')">
+          <label for="dp-no">❌ No</label>
+        </div>
+      </div>
+      <div id="dp-det" style="display:none" class="field">
+        <label>Cuéntame en qué consistía, qué aspectos fueron relevantes y por qué no mantuviste la adherencia
+          <span class="hint">Tipo de dieta, duración, qué funcionó, qué no, por qué la dejaste…</span>
+        </label>
+        <textarea id="dietas_previas" placeholder="Ej: Dieta keto durante 3 meses — bajé 5 kg pero no podía mantenerla socialmente. Conté calorías con MyFitnessPal, me fue bien al principio pero me generó ansiedad. El ayuno intermitente 16/8 lo aguanté bien en semana pero no los fines de semana…" style="min-height:110px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(1)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(3)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 3 — RUTINA DIARIA Y ACTIVIDAD
+════════════════════════════════════════════════ -->
+<section class="step" id="step-3" style="display:none">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div>
+      <div class="step-title">Rutina Diaria y Actividad</div>
+      <div class="step-desc">¿Cómo es un día tipo tuyo? Cuéntame qué haces, cuándo y cuánto tiempo</div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>¿Por qué es importante?</strong> Tu actividad diaria determina cuánta energía necesitas en cada momento. Cada tipo de día (con o sin ejercicio, en casa o en el trabajo) tendrá un plan diferente.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Trabajo / Estudio</div>
+    <div class="form-grid">
+
+      <!-- ── PRIMERA PREGUNTA ── -->
+      <div class="field full">
+        <label>¿Cuál es tu situación laboral o académica actual? <span class="req">*</span></label>
+        <div class="pill-group">
+          <input type="radio" name="situacion_laboral" id="sl-trabajo"     value="Trabajo"                  onchange="toggleSituacionLaboral()"><label for="sl-trabajo">💼 Trabajo</label>
+          <input type="radio" name="situacion_laboral" id="sl-estudio"     value="Estudio"                  onchange="toggleSituacionLaboral()"><label for="sl-estudio">📚 Estudio</label>
+          <input type="radio" name="situacion_laboral" id="sl-ambos"       value="Trabajo y estudio"         onchange="toggleSituacionLaboral()"><label for="sl-ambos">💼📚 Trabajo y estudio</label>
+          <input type="radio" name="situacion_laboral" id="sl-desempleado" value="Desempleado / No estudio" onchange="toggleSituacionLaboral()"><label for="sl-desempleado">🔴 Desempleado / No estudio</label>
+        </div>
+      </div>
+
+      <!-- BLOQUE TRABAJO -->
+      <div id="bloque-trabajo" style="display:none" class="field full">
+        <div style="border:2px solid var(--sage);border-radius:14px;padding:18px;background:var(--sage-pale)">
+          <div style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);margin-bottom:14px">💼 Datos de tu trabajo</div>
+          <div class="form-grid" style="margin-bottom:0">
+            <div class="field">
+              <label>Tipo de actividad física en el trabajo</label>
+              <select id="tipo_trabajo">
+                <option value="">Selecciona tu tipo de trabajo…</option>
+                <optgroup label="🏅 Deporte y Actividad Física (MET 3.5–5.0)">
+                  <option value="Entrenador personal / Preparador físico">Entrenador personal / Preparador físico</option>
+                  <option value="Monitor deportivo (gym, piscina, clases colectivas)">Monitor deportivo (gym, piscina, clases)</option>
+                  <option value="Fisioterapeuta / Kinesiólogo">Fisioterapeuta / Kinesiólogo</option>
+                  <option value="Árbitro deportivo">Árbitro deportivo</option>
+                </optgroup>
+                <optgroup label="💼 Trabajo Sedentario (MET 1.3–1.5)">
+                  <option value="Trabajo de oficina / administrativo">Oficina / Administración / Teletrabajo</option>
+                  <option value="Trabajo sentado (teleoperador, call center)">Teleoperador / Atención al cliente (sentado)</option>
+                  <option value="Informático / programador">Informático / Programador</option>
+                  <option value="Conductor (coche, taxi, camión)">Conductor (taxi, camión, autobús)</option>
+                </optgroup>
+                <optgroup label="🚶 Trabajo Moderado / De pie (MET 2.0–3.5)">
+                  <option value="Docente / Profesor (clase en pie)">Docente / Profesor</option>
+                  <option value="Médico / Enfermero/a (hospital, consulta)">Médico/a · Enfermero/a · Sanitario</option>
+                  <option value="Dependiente / Comercio (de pie y moviéndose)">Dependiente / Comercio</option>
+                  <option value="Camarero/a (hostelería, restaurante)">Camarero/a · Hostelería</option>
+                  <option value="Cocinero/a (cocina profesional)">Cocinero/a · Cocina profesional</option>
+                </optgroup>
+                <optgroup label="🔧 Trabajo Manual Moderado (MET 3.5–5.0)">
+                  <option value="Fontanero / Electricista / Técnico">Fontanero / Electricista / Técnico</option>
+                  <option value="Trabajo en almacén (con cargas moderadas)">Almacén / Logística (cargas moderadas)</option>
+                  <option value="Mecánico / Carpintero / Albañil">Mecánico / Carpintero / Albañil</option>
+                </optgroup>
+                <optgroup label="💪 Trabajo Físico Intenso (MET 5.5–8.0)">
+                  <option value="Albañil / Peón de construcción (carga pesada)">Peón de construcción / Carga pesada</option>
+                  <option value="Agricultor / Granjero (trabajo de campo)">Agricultor / Trabajo de campo</option>
+                  <option value="Mudanzas / Carga y descarga pesada">Mudanzas / Carga y descarga pesada</option>
+                  <option value="Bombero / Rescatador">Bombero / Rescatador</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="field full">
+              <label>Tipo de jornada laboral</label>
+              <div class="pill-group">
+                <input type="radio" name="horario_tipo" id="ht-fijo"    value="Horario fijo"        onchange="toggleHorarioTipo()"><label for="ht-fijo">📅 Horario fijo</label>
+                <input type="radio" name="horario_tipo" id="ht-turnos"  value="Turnos rotativos"    onchange="toggleHorarioTipo()"><label for="ht-turnos">🔄 Turnos rotativos</label>
+                <input type="radio" name="horario_tipo" id="ht-partido" value="Horario partido"     onchange="toggleHorarioTipo()"><label for="ht-partido">🌅🌆 Horario partido</label>
+                <input type="radio" name="horario_tipo" id="ht-auto"    value="Autónomo / variable" onchange="toggleHorarioTipo()"><label for="ht-auto">🆓 Autónomo / variable</label>
+              </div>
+            </div>
+            <div id="bloque-fijo" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Días que trabajas</div>
+                <div class="days-check" style="margin-bottom:12px">
+                  <input type="checkbox" id="ht-f-l" name="ht-fijo-dias" value="Lunes"><label for="ht-f-l">L</label>
+                  <input type="checkbox" id="ht-f-m" name="ht-fijo-dias" value="Martes"><label for="ht-f-m">M</label>
+                  <input type="checkbox" id="ht-f-x" name="ht-fijo-dias" value="Miércoles"><label for="ht-f-x">X</label>
+                  <input type="checkbox" id="ht-f-j" name="ht-fijo-dias" value="Jueves"><label for="ht-f-j">J</label>
+                  <input type="checkbox" id="ht-f-v" name="ht-fijo-dias" value="Viernes"><label for="ht-f-v">V</label>
+                  <input type="checkbox" id="ht-f-s" name="ht-fijo-dias" value="Sábado"><label for="ht-f-s">S</label>
+                  <input type="checkbox" id="ht-f-d" name="ht-fijo-dias" value="Domingo"><label for="ht-f-d">D</label>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Horario</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <input type="time" id="trabajo_inicio" style="flex:1;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;background:#fff;outline:none">
+                  <span style="color:var(--gray);font-size:14px;font-weight:700">→</span>
+                  <input type="time" id="trabajo_fin" style="flex:1;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;background:#fff;outline:none">
+                </div>
+              </div>
+            </div>
+            <div id="bloque-turnos" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Turnos que realizas</div>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+                  <div style="display:grid;grid-template-columns:auto 1fr 110px 18px 110px;gap:8px;align-items:center">
+                    <input type="checkbox" id="tur-man" style="width:16px;height:16px;accent-color:var(--sage)">
+                    <label for="tur-man" style="font-size:13px;font-weight:600;color:var(--ink)">🌅 Mañana</label>
+                    <input type="time" id="tur-man-ini" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                    <span style="text-align:center;color:var(--gray);font-size:12px">→</span>
+                    <input type="time" id="tur-man-fin" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                  </div>
+                  <div style="display:grid;grid-template-columns:auto 1fr 110px 18px 110px;gap:8px;align-items:center">
+                    <input type="checkbox" id="tur-tar" style="width:16px;height:16px;accent-color:var(--sage)">
+                    <label for="tur-tar" style="font-size:13px;font-weight:600;color:var(--ink)">🌆 Tarde</label>
+                    <input type="time" id="tur-tar-ini" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                    <span style="text-align:center;color:var(--gray);font-size:12px">→</span>
+                    <input type="time" id="tur-tar-fin" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                  </div>
+                  <div style="display:grid;grid-template-columns:auto 1fr 110px 18px 110px;gap:8px;align-items:center">
+                    <input type="checkbox" id="tur-noch" style="width:16px;height:16px;accent-color:var(--sage)">
+                    <label for="tur-noch" style="font-size:13px;font-weight:600;color:var(--ink)">🌙 Noche</label>
+                    <input type="time" id="tur-noch-ini" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                    <span style="text-align:center;color:var(--gray);font-size:12px">→</span>
+                    <input type="time" id="tur-noch-fin" style="font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;background:#fff;outline:none">
+                  </div>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Patrón de rotación</div>
+                <textarea id="turnos_patron" placeholder="Ej: Semana de mañanas y semana de tardes alternadas. Algún domingo de guardia…" style="min-height:60px;width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:13px;resize:vertical;background:#fff;outline:none"></textarea>
+              </div>
+            </div>
+            <div id="bloque-partido" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Días con horario partido</div>
+                <div class="days-check" style="margin-bottom:12px">
+                  <input type="checkbox" id="ht-p-l" name="ht-partido-dias" value="Lunes"><label for="ht-p-l">L</label>
+                  <input type="checkbox" id="ht-p-m" name="ht-partido-dias" value="Martes"><label for="ht-p-m">M</label>
+                  <input type="checkbox" id="ht-p-x" name="ht-partido-dias" value="Miércoles"><label for="ht-p-x">X</label>
+                  <input type="checkbox" id="ht-p-j" name="ht-partido-dias" value="Jueves"><label for="ht-p-j">J</label>
+                  <input type="checkbox" id="ht-p-v" name="ht-partido-dias" value="Viernes"><label for="ht-p-v">V</label>
+                  <input type="checkbox" id="ht-p-s" name="ht-partido-dias" value="Sábado"><label for="ht-p-s">S</label>
+                  <input type="checkbox" id="ht-p-d" name="ht-partido-dias" value="Domingo"><label for="ht-p-d">D</label>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div>
+                    <div style="font-size:11px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🌅 Bloque mañana</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="time" id="partido_man_ini" style="flex:1;font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;background:#fff;outline:none">
+                      <span style="color:var(--gray);font-size:12px">→</span>
+                      <input type="time" id="partido_man_fin" style="flex:1;font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;background:#fff;outline:none">
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🌆 Bloque tarde</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input type="time" id="partido_tar_ini" style="flex:1;font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;background:#fff;outline:none">
+                      <span style="color:var(--gray);font-size:12px">→</span>
+                      <input type="time" id="partido_tar_fin" style="flex:1;font-family:inherit;font-size:12px;border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;background:#fff;outline:none">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="bloque-auto" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Describe tu dinámica de trabajo habitual</div>
+                <textarea id="auto_descripcion" placeholder="Ej: Trabajo L-V pero los horarios varían. Algunos días empiezo a las 7h y otros a las 10h…" style="min-height:80px;width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:13px;resize:vertical;background:#fff;outline:none"></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <label>¿Comes en el trabajo?</label>
+              <div class="pill-group">
+                <input type="radio" name="come_trabajo_yn" id="cty-si" value="Sí" onchange="toggleComeTrabajo()"><label for="cty-si">✅ Sí</label>
+                <input type="radio" name="come_trabajo_yn" id="cty-no" value="No" onchange="toggleComeTrabajo()"><label for="cty-no">❌ No</label>
+              </div>
+            </div>
+
+            <!-- SI come en el trabajo -->
+            <div id="come-trabajo-si" style="display:none" class="field full">
+
+              <!-- Hint de horario detectado -->
+              <div id="trabajo-horario-hint" style="display:none;background:var(--amber-light);border-left:3px solid var(--amber);border-radius:8px;padding:9px 14px;font-size:12px;color:#5c3d1a;margin-bottom:12px"></div>
+
+              <label style="font-weight:700;font-size:13px;margin-bottom:8px;display:block">
+                ¿Qué ingestas realizas durante tu jornada laboral?
+                <span class="hint">Marca las que haces mientras estás en el trabajo o en horario laboral</span>
+              </label>
+
+              <!-- Checkboxes de ingestas -->
+              <div class="pill-group" style="margin-bottom:14px">
+                <input type="checkbox" id="tc-desayuno" name="trabajo_comidas" value="🌅 Desayuno"               onchange="toggleTrabajoComidasDet('tc-desayuno','desayuno')">
+                <label for="tc-desayuno">🌅 Desayuno</label>
+                <input type="checkbox" id="tc-almuerzo" name="trabajo_comidas" value="☕ Almuerzo / Media mañana" onchange="toggleTrabajoComidasDet('tc-almuerzo','almuerzo')">
+                <label for="tc-almuerzo">☕ Almuerzo</label>
+                <input type="checkbox" id="tc-comida"   name="trabajo_comidas" value="🍽️ Comida"                onchange="toggleTrabajoComidasDet('tc-comida','comida')">
+                <label for="tc-comida">🍽️ Comida</label>
+                <input type="checkbox" id="tc-merienda" name="trabajo_comidas" value="🍌 Merienda"               onchange="toggleTrabajoComidasDet('tc-merienda','merienda')">
+                <label for="tc-merienda">🍌 Merienda</label>
+                <input type="checkbox" id="tc-cena"     name="trabajo_comidas" value="🌙 Cena"                   onchange="toggleTrabajoComidasDet('tc-cena','cena')">
+                <label for="tc-cena">🌙 Cena</label>
+              </div>
+
+              <!-- Detalle por ingesta: Desayuno -->
+              <div id="tc-det-desayuno" style="display:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--cream)">
+                <div style="font-size:11px;font-weight:800;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🌅 Desayuno en el trabajo</div>
+                <div class="pill-group" style="margin-bottom:8px">
+                  <input type="radio" name="ctm-desayuno" id="ctm-des-tupper" value="Tupper" onchange="toggleTrabajoComidasModo('desayuno')"><label for="ctm-des-tupper">🥡 Tupper</label>
+                  <input type="radio" name="ctm-desayuno" id="ctm-des-rest"   value="Restaurante / bar" onchange="toggleTrabajoComidasModo('desayuno')"><label for="ctm-des-rest">🍽️ Restaurante / bar</label>
+                </div>
+                <div id="ctm-det-desayuno-tupper" style="display:none"><textarea id="trabajo_desayuno_tupper" placeholder="¿Qué sueles llevarte para desayunar?…" style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+                <div id="ctm-det-desayuno-rest"   style="display:none"><textarea id="trabajo_desayuno_rest"   placeholder="¿Dónde y qué sueles desayunar?…"    style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+              </div>
+
+              <!-- Detalle por ingesta: Almuerzo -->
+              <div id="tc-det-almuerzo" style="display:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--cream)">
+                <div style="font-size:11px;font-weight:800;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">☕ Almuerzo / Media mañana en el trabajo</div>
+                <div class="pill-group" style="margin-bottom:8px">
+                  <input type="radio" name="ctm-almuerzo" id="ctm-alm-tupper" value="Tupper" onchange="toggleTrabajoComidasModo('almuerzo')"><label for="ctm-alm-tupper">🥡 Tupper</label>
+                  <input type="radio" name="ctm-almuerzo" id="ctm-alm-rest"   value="Restaurante / bar" onchange="toggleTrabajoComidasModo('almuerzo')"><label for="ctm-alm-rest">🍽️ Restaurante / bar</label>
+                </div>
+                <div id="ctm-det-almuerzo-tupper" style="display:none"><textarea id="trabajo_almuerzo_tupper" placeholder="¿Qué sueles llevarte para el almuerzo?…" style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+                <div id="ctm-det-almuerzo-rest"   style="display:none"><textarea id="trabajo_almuerzo_rest"   placeholder="¿Dónde y qué sueles almorzar?…"       style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+              </div>
+
+              <!-- Detalle por ingesta: Comida -->
+              <div id="tc-det-comida" style="display:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--cream)">
+                <div style="font-size:11px;font-weight:800;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🍽️ Comida principal en el trabajo</div>
+                <div class="pill-group" style="margin-bottom:8px">
+                  <input type="radio" name="ctm-comida" id="ctm-com-tupper" value="Tupper" onchange="toggleTrabajoComidasModo('comida')"><label for="ctm-com-tupper">🥡 Tupper</label>
+                  <input type="radio" name="ctm-comida" id="ctm-com-rest"   value="Restaurante / bar" onchange="toggleTrabajoComidasModo('comida')"><label for="ctm-com-rest">🍽️ Restaurante / bar</label>
+                </div>
+                <div id="ctm-det-comida-tupper" style="display:none"><textarea id="trabajo_comida_tupper" placeholder="¿Qué sueles llevarte de comida?…"    style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+                <div id="ctm-det-comida-rest"   style="display:none"><textarea id="trabajo_comida_rest"   placeholder="¿Dónde y qué sueles comer?…"         style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+              </div>
+
+              <!-- Detalle por ingesta: Merienda -->
+              <div id="tc-det-merienda" style="display:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--cream)">
+                <div style="font-size:11px;font-weight:800;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🍌 Merienda en el trabajo</div>
+                <div class="pill-group" style="margin-bottom:8px">
+                  <input type="radio" name="ctm-merienda" id="ctm-mer-tupper" value="Tupper" onchange="toggleTrabajoComidasModo('merienda')"><label for="ctm-mer-tupper">🥡 Tupper</label>
+                  <input type="radio" name="ctm-merienda" id="ctm-mer-rest"   value="Restaurante / bar" onchange="toggleTrabajoComidasModo('merienda')"><label for="ctm-mer-rest">🍽️ Restaurante / bar</label>
+                </div>
+                <div id="ctm-det-merienda-tupper" style="display:none"><textarea id="trabajo_merienda_tupper" placeholder="¿Qué sueles llevarte de merienda?…" style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+                <div id="ctm-det-merienda-rest"   style="display:none"><textarea id="trabajo_merienda_rest"   placeholder="¿Dónde y qué meriendas?…"         style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+              </div>
+
+              <!-- Detalle por ingesta: Cena -->
+              <div id="tc-det-cena" style="display:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:0;background:var(--cream)">
+                <div style="font-size:11px;font-weight:800;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🌙 Cena en o cerca del trabajo</div>
+                <div class="pill-group" style="margin-bottom:8px">
+                  <input type="radio" name="ctm-cena" id="ctm-cen-tupper" value="Tupper" onchange="toggleTrabajoComidasModo('cena')"><label for="ctm-cen-tupper">🥡 Tupper</label>
+                  <input type="radio" name="ctm-cena" id="ctm-cen-rest"   value="Restaurante / bar" onchange="toggleTrabajoComidasModo('cena')"><label for="ctm-cen-rest">🍽️ Restaurante / bar</label>
+                </div>
+                <div id="ctm-det-cena-tupper" style="display:none"><textarea id="trabajo_cena_tupper" placeholder="¿Qué sueles llevarte para cenar?…" style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+                <div id="ctm-det-cena-rest"   style="display:none"><textarea id="trabajo_cena_rest"   placeholder="¿Dónde y qué sueles cenar?…"    style="min-height:55px;width:100%;font-family:inherit;font-size:13px;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;resize:vertical;outline:none"></textarea></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOQUE ESTUDIO -->
+      <div id="bloque-estudio" style="display:none" class="field full">
+        <div style="border:2px solid #2c5fa8;border-radius:14px;padding:18px;background:#eef2fa">
+          <div style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#2c5fa8;margin-bottom:14px">📚 Datos de tus estudios</div>
+          <div class="form-grid" style="margin-bottom:0">
+            <div class="field full">
+              <label>Modalidad de estudio</label>
+              <div class="pill-group">
+                <input type="radio" name="estudio_modalidad" id="em-pres"   value="Presencial" onchange="toggleEstudioModalidad();updateStudyOptions()"><label for="em-pres">🏫 Presencial</label>
+                <input type="radio" name="estudio_modalidad" id="em-online" value="Online"      onchange="toggleEstudioModalidad();updateStudyOptions()"><label for="em-online">💻 Online</label>
+                <input type="radio" name="estudio_modalidad" id="em-mixto"  value="Mixto"       onchange="toggleEstudioModalidad();updateStudyOptions()"><label for="em-mixto">🔀 Mixto</label>
+              </div>
+            </div>
+            <div class="field" id="campo-tipo-estudio" style="display:none">
+              <label>Tipo de estudio (para cálculo energético)</label>
+              <select id="tipo_estudio">
+                <option value="">Selecciona la modalidad primero…</option>
+              </select>
+              <span style="font-size:11px;color:var(--sage);font-style:italic;margin-top:3px;display:block">
+                Las opciones cambian según la modalidad seleccionada arriba.
+              </span>
+            </div>
+            <div id="bloque-estudio-pres" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid #b0c4e8">
+                <div style="font-size:11px;font-weight:700;color:#2c5fa8;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Días de clase presencial</div>
+                <div class="days-check" style="margin-bottom:12px">
+                  <input type="checkbox" id="est-p-l" name="est-pres-dias" value="Lunes"><label for="est-p-l">L</label>
+                  <input type="checkbox" id="est-p-m" name="est-pres-dias" value="Martes"><label for="est-p-m">M</label>
+                  <input type="checkbox" id="est-p-x" name="est-pres-dias" value="Miércoles"><label for="est-p-x">X</label>
+                  <input type="checkbox" id="est-p-j" name="est-pres-dias" value="Jueves"><label for="est-p-j">J</label>
+                  <input type="checkbox" id="est-p-v" name="est-pres-dias" value="Viernes"><label for="est-p-v">V</label>
+                  <input type="checkbox" id="est-p-s" name="est-pres-dias" value="Sábado"><label for="est-p-s">S</label>
+                  <input type="checkbox" id="est-p-d" name="est-pres-dias" value="Domingo"><label for="est-p-d">D</label>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#2c5fa8;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Horario habitual de clases</div>
+                <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+                  <input type="time" id="clase_inicio" style="flex:1;font-family:inherit;font-size:13px;border:1.5px solid #b0c4e8;border-radius:8px;padding:7px 10px;background:#fff;outline:none">
+                  <span style="color:var(--gray);font-size:14px;font-weight:700">→</span>
+                  <input type="time" id="clase_fin" style="flex:1;font-family:inherit;font-size:13px;border:1.5px solid #b0c4e8;border-radius:8px;padding:7px 10px;background:#fff;outline:none">
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#2c5fa8;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Observaciones del horario</div>
+                <textarea id="clase_obs" placeholder="Ej: Lunes 8-14h, martes y jueves 9-13h, viernes prácticas 15-18h…" style="min-height:60px;width:100%;border:1.5px solid #b0c4e8;border-radius:8px;padding:8px 12px;font-family:inherit;font-size:13px;resize:vertical;background:#fff;outline:none"></textarea>
+              </div>
+            </div>
+            <div id="bloque-estudio-online" style="display:none" class="field full">
+              <div style="background:#fff;border-radius:10px;padding:14px;border:1.5px solid #b0c4e8">
+                <div style="font-size:11px;font-weight:700;color:#2c5fa8;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">¿Cuándo sueles estudiar habitualmente?</div>
+                <div class="pill-group" style="margin-bottom:12px">
+                  <input type="checkbox" name="online_momento" id="om-man"  value="Por las mañanas"><label for="om-man">🌅 Mañanas</label>
+                  <input type="checkbox" name="online_momento" id="om-med"  value="Al mediodía"><label for="om-med">☀️ Mediodía</label>
+                  <input type="checkbox" name="online_momento" id="om-tar"  value="Por las tardes"><label for="om-tar">🌆 Tardes</label>
+                  <input type="checkbox" name="online_momento" id="om-noch" value="Por las noches"><label for="om-noch">🌙 Noches</label>
+                  <input type="checkbox" name="online_momento" id="om-var"  value="Varía mucho"><label for="om-var">🔀 Varía mucho</label>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#2c5fa8;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Horas aproximadas de estudio al día</div>
+                <select id="online_horas" style="font-family:inherit;font-size:13px;border:1.5px solid #b0c4e8;border-radius:8px;padding:8px 12px;background:#fff;outline:none;width:100%;cursor:pointer">
+                  <option value="">Selecciona…</option>
+                  <option>Menos de 2 horas</option>
+                  <option>2 - 4 horas</option>
+                  <option>4 - 6 horas</option>
+                  <option>6 - 8 horas</option>
+                  <option>Más de 8 horas</option>
+                  <option>Varía mucho según el día</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- INFORMACIÓN EXTRA (visible si trabaja o estudia) -->
+      <div id="bloque-extra-laboral" style="display:none" class="field full">
+        <label>¿Quieres añadir algo más sobre tu trabajo o estudio?
+          <span class="hint">Tiempos de desplazamiento, pausas, situaciones que afecten a tus horarios de comida, períodos de mayor carga, exámenes, temporadas de estrés…</span>
+        </label>
+        <textarea id="trabajo_extra" placeholder="Ej: En épocas de exámenes mi horario cambia completamente. Los viernes salgo antes y puedo cocinar con calma. El desplazamiento al trabajo me lleva 45 minutos…" style="min-height:80px"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Actividad Física Estructurada (Ejercicio)</div>
+    <div class="info-box" style="margin-bottom:18px">
+      <strong>📋 Cómo rellenar este apartado:</strong> añade <strong>cada actividad por separado</strong>, incluyendo todos los deportes y entrenos que realizas a lo largo de la semana.<br><br>
+      <strong>Importante:</strong> si practicas un deporte en el que además compites, añádelo <strong>dos veces</strong>: una como entrenamiento y otra como competición, ya que el gasto energético y la planificación nutricional son diferentes en cada caso por la diferencia de intensidad y duración.<br><br>
+      <em>Ejemplo: si juegas al pádel y también vas al gimnasio, crea una entrada para "Pádel – Entrenamiento", otra para "Pádel – Competición" (si la hay) y otra para "Musculación / Pesas".</em>
+    </div>
+    <div id="actividades-container">
+      <div class="activity-block" id="act-1">
+        <button type="button" class="remove-btn" onclick="removeActivity(this)" title="Eliminar">×</button>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Tipo de ejercicio o deporte</label>
+            <div class="sport-search-wrap">
+              <input type="text" class="sport-search-input" placeholder="🔍 Busca o escribe el deporte / actividad…" oninput="filtrarDeportes(this)" onfocus="abrirDropdown(this)" autocomplete="off">
+              <div class="sport-dropdown" style="display:none"></div>
+              <input type="hidden" class="act-tipo-val">
+            </div>
+          </div>
+          <div class="field">
+            <label>Modalidad</label>
+            <div class="pill-group">
+              <input type="radio" name="act-modalidad-1" id="am1-ent" value="Entrenamiento"><label for="am1-ent">🏋️ Entrenamiento</label>
+              <input type="radio" name="act-modalidad-1" id="am1-comp" value="Competición"><label for="am1-comp">🏆 Competición</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Intensidad percibida (RPE)</label>
+            <select class="act-intensidad">
+              <option value="">Selecciona…</option>
+              <option>Baja (1-3): conversación fácil</option>
+              <option>Moderada (4-6): algo de fatiga</option>
+              <option>Alta (7-8): difícil hablar</option>
+              <option>Máxima (9-10): no puedo más</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Hora de inicio → fin</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="time" class="act-inicio" style="flex:1">
+              <span style="color:var(--gray);font-size:13px">→</span>
+              <input type="time" class="act-fin" style="flex:1">
+            </div>
+          </div>
+          <div class="field full">
+            <label>¿Qué días realizas esta actividad?</label>
+            <div class="days-check">
+              <input type="checkbox" id="act1-l" value="Lunes"><label for="act1-l">L</label>
+              <input type="checkbox" id="act1-m" value="Martes"><label for="act1-m">M</label>
+              <input type="checkbox" id="act1-x" value="Miércoles"><label for="act1-x">X</label>
+              <input type="checkbox" id="act1-j" value="Jueves"><label for="act1-j">J</label>
+              <input type="checkbox" id="act1-v" value="Viernes"><label for="act1-v">V</label>
+              <input type="checkbox" id="act1-s" value="Sábado"><label for="act1-s">S</label>
+              <input type="checkbox" id="act1-d" value="Domingo"><label for="act1-d">D</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="add-btn" onclick="addActivity()">+ Añadir otra actividad</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Actividad No Estructurada (NEAT)</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Cuántos pasos caminas aproximadamente al día?</label>
+        <div class="pill-group">
+          <input type="radio" name="pasos" id="p1" value="< 3.000"><label for="p1">< 3.000</label>
+          <input type="radio" name="pasos" id="p2" value="3.000-6.000"><label for="p2">3.000-6.000</label>
+          <input type="radio" name="pasos" id="p3" value="6.000-10.000"><label for="p3">6.000-10.000</label>
+          <input type="radio" name="pasos" id="p4" value="> 10.000"><label for="p4">> 10.000</label>
+          <input type="radio" name="pasos" id="p5" value="No lo sé"><label for="p5">No lo sé</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Cómo te desplazas habitualmente?</label>
+        <div class="pill-group">
+          <input type="checkbox" name="desplazamiento" id="ds-coche" value="Coche"><label for="ds-coche">🚗 Coche</label>
+          <input type="checkbox" name="desplazamiento" id="ds-moto" value="Moto"><label for="ds-moto">🏍 Moto</label>
+          <input type="checkbox" name="desplazamiento" id="ds-bici" value="Bicicleta"><label for="ds-bici">🚲 Bicicleta</label>
+          <input type="checkbox" name="desplazamiento" id="ds-caminando" value="A pie"><label for="ds-caminando">🚶 A pie</label>
+          <input type="checkbox" name="desplazamiento" id="ds-transporte" value="Transporte público"><label for="ds-transporte">🚌 Transporte público</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Observaciones sobre tu actividad diaria no estructurada
+          <span class="hint">Ej: Uso el coche para ir a trabajar pero por las tardes me muevo andando. Uso el bus para mis entrenamientos…</span>
+        </label>
+        <textarea id="neat_obs" placeholder="Cuéntame cómo te mueves fuera del ejercicio programado: desplazamientos, escaleras, recados, trabajo en casa…" style="min-height:80px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(2)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(4)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 4 — INGESTAS, HIDRATACIÓN Y SUEÑO
+════════════════════════════════════════════════ -->
+<section class="step" id="step-4" style="display:none">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div>
+      <div class="step-title">Ingestas, Hidratación y Sueño</div>
+      <div class="step-desc">Define la estructura de ingestas por tipo de día, y cuéntame cómo duermes y cuánto bebes</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗓️ Tu Semana — Actividades e Ingestas</div>
+    <div class="info-box">
+      <strong>¿Cómo funciona?</strong> A continuación verás los 7 días de tu semana. En cada uno aparecen automáticamente las actividades y el horario laboral que indicaste en el paso anterior. Solo tienes que añadir las ingestas que haces ese día y a qué hora. Así podré ver exactamente qué comes y cuándo en función de lo que tienes programado cada día.<br><br>
+      Si modificas las actividades del paso anterior, pulsa el botón para actualizar la información.
+    </div>
+    <button class="semana-refresh-btn" onclick="construirSemana()">🔄 Cargar / actualizar desde mis actividades</button>
+    <div class="semana-grid" id="semana-grid">
+      <!-- Lunes -->
+      <div class="dia-card" id="dia-card-Lunes">
+        <div class="dia-header"><div class="dia-badge">L</div><div class="dia-nombre">Lunes</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Lunes"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Lunes" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Lunes"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Lunes')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Lunes" onclick="copiarIngestasASimilares('Lunes')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Martes -->
+      <div class="dia-card" id="dia-card-Martes">
+        <div class="dia-header"><div class="dia-badge">M</div><div class="dia-nombre">Martes</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Martes"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Martes" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Martes"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Martes')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Martes" onclick="copiarIngestasASimilares('Martes')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Miércoles -->
+      <div class="dia-card" id="dia-card-Miércoles">
+        <div class="dia-header"><div class="dia-badge">X</div><div class="dia-nombre">Miércoles</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Miércoles"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Miércoles" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Miércoles"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Miércoles')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Miércoles" onclick="copiarIngestasASimilares('Miércoles')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Jueves -->
+      <div class="dia-card" id="dia-card-Jueves">
+        <div class="dia-header"><div class="dia-badge">J</div><div class="dia-nombre">Jueves</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Jueves"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Jueves" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Jueves"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Jueves')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Jueves" onclick="copiarIngestasASimilares('Jueves')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Viernes -->
+      <div class="dia-card" id="dia-card-Viernes">
+        <div class="dia-header"><div class="dia-badge">V</div><div class="dia-nombre">Viernes</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Viernes"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Viernes" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Viernes"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Viernes')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Viernes" onclick="copiarIngestasASimilares('Viernes')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Sábado -->
+      <div class="dia-card" id="dia-card-Sábado">
+        <div class="dia-header"><div class="dia-badge">S</div><div class="dia-nombre">Sábado</div></div>
+        <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Sábado"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+        <div id="dia-similares-banner-Sábado" class="dia-similares-banner"></div>
+        <div>
+          <div class="dia-section-lbl">🍴 Ingestas</div>
+          <div class="dia-meals" id="dia-meals-Sábado"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            <button class="dia-add-meal" onclick="addDiaMeal('Sábado')">+ Añadir ingesta</button>
+            <button class="dia-copy-btn" id="dia-copy-Sábado" onclick="copiarIngestasASimilares('Sábado')">📋 Copiar a días similares</button>
+          </div>
+        </div>
+      </div>
+      <!-- Domingo -->
+      <div class="dia-card" id="dia-card-Domingo" style="grid-column:1/-1">
+        <div class="dia-header"><div class="dia-badge" style="background:#6b7b70">D</div><div class="dia-nombre">Domingo</div></div>
+        <div id="dia-similares-banner-Domingo" class="dia-similares-banner" style="margin-bottom:4px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><div class="dia-section-lbl">📌 Actividades registradas</div><div class="dia-ref" id="dia-ref-Domingo"><span class="dia-ref-empty">Pulsa "Cargar" para sincronizar</span></div></div>
+          <div>
+            <div class="dia-section-lbl">🍴 Ingestas</div>
+            <div class="dia-meals" id="dia-meals-Domingo"></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+              <button class="dia-add-meal" onclick="addDiaMeal('Domingo')">+ Añadir ingesta</button>
+              <button class="dia-copy-btn" id="dia-copy-Domingo" onclick="copiarIngestasASimilares('Domingo')">📋 Copiar a días similares</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🌙 Sueño</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Hora habitual de levantarse</label>
+        <input type="time" id="hora_levantarse">
+      </div>
+      <div class="field">
+        <label>Hora habitual de acostarse</label>
+        <input type="time" id="hora_acostarse">
+      </div>
+      <div class="field full">
+        <label>Calidad del sueño percibida</label>
+        <div class="pill-group">
+          <input type="radio" name="calidad_sueño" id="cs-muy-buena" value="Muy buena"><label for="cs-muy-buena">😴 Muy buena</label>
+          <input type="radio" name="calidad_sueño" id="cs-buena" value="Buena"><label for="cs-buena">🙂 Buena</label>
+          <input type="radio" name="calidad_sueño" id="cs-regular" value="Regular"><label for="cs-regular">😐 Regular</label>
+          <input type="radio" name="calidad_sueño" id="cs-mala" value="Mala"><label for="cs-mala">😔 Mala</label>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Observaciones sobre tu sueño
+          <span class="hint">Horarios irregulares, dificultad para conciliar el sueño, despertares nocturnos, etc.</span>
+        </label>
+        <textarea id="sueno_obs" placeholder="Ej: Me cuesta conciliar el sueño, me despierto 2-3 veces por la noche, los fines de semana me acuesto muy tarde…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💧 Hidratación</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Cantidad de agua que bebes al día</label>
+        <select id="agua">
+          <option value="">Selecciona…</option>
+          <option value="Menos de 1 litro (~4 vasos o menos)">Menos de 1 litro — aprox. 4 vasos o menos</option>
+          <option value="1 - 1,5 litros (~4-6 vasos)">1 – 1,5 litros — aprox. 4 a 6 vasos</option>
+          <option value="1,5 - 2 litros (~6-8 vasos)">1,5 – 2 litros — aprox. 6 a 8 vasos</option>
+          <option value="2 - 2,5 litros (~8-10 vasos)">2 – 2,5 litros — aprox. 8 a 10 vasos</option>
+          <option value="Más de 2,5 litros (~10 vasos o más)">Más de 2,5 litros — aprox. 10 vasos o más</option>
+          <option value="No controlo mi consumo de agua">No controlo cuánta bebo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bebidas habituales (además de agua)</label>
+        <div class="pill-group">
+          <input type="checkbox" name="bebidas" id="beb-cafe" value="Café"><label for="beb-cafe">☕ Café</label>
+          <input type="checkbox" name="bebidas" id="beb-te" value="Té/Infusión"><label for="beb-te">🍵 Té/Infusión</label>
+          <input type="checkbox" name="bebidas" id="beb-refrescos" value="Refrescos con azúcar"><label for="beb-refrescos">🥤 Refrescos</label>
+          <input type="checkbox" name="bebidas" id="beb-0" value="Refrescos 0%"><label for="beb-0">🫧 Zero/0%</label>
+          <input type="checkbox" name="bebidas" id="beb-zumo" value="Zumos"><label for="beb-zumo">🍊 Zumos</label>
+          <input type="checkbox" name="bebidas" id="beb-alcohol" value="Alcohol (ocasional)"><label for="beb-alcohol">🍷 Alcohol (ocas.)</label>
+          <input type="checkbox" name="bebidas" id="beb-alco-freq" value="Alcohol (frecuente)"><label for="beb-alco-freq">🍺 Alcohol (freq.)</label>
+          <input type="checkbox" name="bebidas" id="beb-proteina" value="Batido proteína"><label for="beb-proteina">💪 Proteína</label>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Observaciones sobre tu hidratación
+          <span class="hint">Sensación de sed frecuente, dificultad para beber suficiente agua, si bebes más en ciertos momentos…</span>
+        </label>
+        <textarea id="hidratacion_obs" placeholder="Ej: Bebo casi toda el agua por la tarde porque de mañana no tengo sed. Los días de entrenamiento bebo mucho más. Casi nunca bebo agua sola, necesito sabor…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(3)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(5)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 5 — PREFERENCIAS ALIMENTARIAS
+════════════════════════════════════════════════ -->
+<section class="step" id="step-5" style="display:none">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div>
+      <div class="step-title">Preferencias Alimentarias</div>
+      <div class="step-desc">¿Qué comes, qué te gusta y qué tienes disponible?</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Alergias e Intolerancias</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>Marca las que te afectan</label>
+        <div class="pill-group">
+          <input type="checkbox" name="alergia" id="al-gluten" value="Gluten / Celiaquía"><label for="al-gluten">🌾 Gluten</label>
+          <input type="checkbox" name="alergia" id="al-lactosa" value="Lactosa"><label for="al-lactosa">🥛 Lactosa</label>
+          <input type="checkbox" name="alergia" id="al-leche" value="Proteína de leche de vaca"><label for="al-leche">🐄 Proteína leche</label>
+          <input type="checkbox" name="alergia" id="al-fructosa" value="Fructosa"><label for="al-fructosa">🍎 Fructosa</label>
+          <input type="checkbox" name="alergia" id="al-huevo" value="Huevo"><label for="al-huevo">🥚 Huevo</label>
+          <input type="checkbox" name="alergia" id="al-frutos-secos" value="Frutos secos"><label for="al-frutos-secos">🥜 Frutos secos</label>
+          <input type="checkbox" name="alergia" id="al-marisco" value="Marisco"><label for="al-marisco">🦐 Marisco</label>
+          <input type="checkbox" name="alergia" id="al-pescado" value="Pescado"><label for="al-pescado">🐟 Pescado</label>
+          <input type="checkbox" name="alergia" id="al-soja" value="Soja"><label for="al-soja">Soja</label>
+          <input type="checkbox" name="alergia" id="al-ninguna" value="Ninguna"><label for="al-ninguna">✅ Ninguna</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Otras alergias, intolerancias o restricciones médicas no listadas</label>
+        <textarea id="otras_alergias" placeholder="Describe aquí cualquier otra restricción…" style="min-height:60px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tipo de Alimentación</div>
+    <div class="field">
+      <label>¿Cómo defines tu alimentación?</label>
+      <div class="pill-group">
+        <input type="radio" name="tipo_alimentacion" id="ta-omni" value="Omnívoro"><label for="ta-omni">🥩 Omnívoro</label>
+        <input type="radio" name="tipo_alimentacion" id="ta-flex" value="Flexitariano"><label for="ta-flex">🌿 Flexitariano</label>
+        <input type="radio" name="tipo_alimentacion" id="ta-vege" value="Vegetariano"><label for="ta-vege">🥗 Vegetariano</label>
+        <input type="radio" name="tipo_alimentacion" id="ta-vegan" value="Vegano"><label for="ta-vegan">🌱 Vegano</label>
+        <input type="radio" name="tipo_alimentacion" id="ta-otro" value="Otro"><label for="ta-otro">Otro</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preferencias y Disponibilidad</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>Alimentos que <strong>más te gustan</strong> o consumes con frecuencia</label>
+        <textarea id="alimentos_gustan" placeholder="Ej: Pollo, huevos, arroz, pasta, aguacate, yogur, plátanos, chocolate negro…"></textarea>
+      </div>
+      <div class="field">
+        <label>Alimentos que <strong>tienes fácilmente en casa</strong> o sueles comprar</label>
+        <textarea id="alimentos_disponibles" placeholder="Ej: Siempre tengo: arroz, pasta, legumbres en conserva, huevos, pechuga de pollo congelada, leche, fruta de temporada…"></textarea>
+      </div>
+      <div class="field">
+        <label>Alimentos que <strong>no te gustan o no comerías</strong></label>
+        <textarea id="alimentos_no_gustan" placeholder="Ej: No me gusta el pescado azul, el hígado, ni las crucíferas (brócoli, coliflor)…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(4)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(6)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 6 — COMIDAS HABITUALES
+════════════════════════════════════════════════ -->
+<section class="step" id="step-6" style="display:none">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div>
+      <div class="step-title">Comidas Habituales</div>
+      <div class="step-desc">Solo verás las ingestas que has registrado en tus días tipo</div>
+    </div>
+  </div>
+
+  <!-- Banner de sincronización — se rellena por JS -->
+  <div id="comidas-sync-banner" class="info-box" style="display:none"></div>
+
+  <div class="card" id="card-desayuno-almuerzo">
+    <div class="card-title">Desayuno y Media Mañana</div>
+    <div class="meal-card" id="mc-desayuno">
+      <div class="meal-card-header"><span class="meal-icon">🌅</span> Desayuno habitual</div>
+      <div class="form-grid cols-1">
+        <div class="field">
+          <label>¿Qué sueles desayunar?</label>
+          <textarea id="desayuno_hab" placeholder="Ej: 3 huevos revueltos con tomate + 2 tostadas de pan integral con aceite + café con leche…"></textarea>
+        </div>
+        <div class="field">
+          <label>¿Otras opciones de desayuno que también hagas?</label>
+          <textarea id="desayuno_otras" placeholder="Ej: A veces tortitas de avena con fruta o yogur con granola…" style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="meal-card" id="mc-almuerzo">
+      <div class="meal-card-header"><span class="meal-icon">☀️</span> Almuerzo / Media mañana</div>
+      <div class="field">
+        <label>¿Qué sueles tomar a media mañana?</label>
+        <textarea id="almuerzo_hab" placeholder="Ej: Una pieza de fruta, un yogur, unos frutos secos o no tomo nada…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-comida">
+    <div class="card-title">Comida Principal</div>
+    <div class="meal-card" id="mc-comida">
+      <div class="meal-card-header"><span class="meal-icon">🍽️</span> Comida del mediodía habitual</div>
+      <div class="form-grid cols-1">
+        <div class="field">
+          <label>¿Qué sueles comer al mediodía?</label>
+          <textarea id="comida_hab" placeholder="Ej: Plato de arroz con pollo a la plancha y ensalada, o lentejas con verduras, o un menú del día (primero, segundo y postre)…"></textarea>
+        </div>
+        <div class="field">
+          <label>¿Otras opciones habituales de comida?</label>
+          <textarea id="comida_otras" placeholder="Ej: Pasta con atún, bocadillo en días de trabajo…" style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-merienda-entreno">
+    <div class="card-title">Merienda y Entrenamiento</div>
+    <div class="meal-card" id="mc-merienda">
+      <div class="meal-card-header"><span class="meal-icon">🍌</span> Merienda habitual</div>
+      <div class="field">
+        <label>¿Qué sueles merendar?</label>
+        <textarea id="merienda_hab" placeholder="Ej: Plátano + yogur proteico, tostada con queso fresco, fruta con frutos secos…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+    <div class="meal-card" id="mc-pre">
+      <div class="meal-card-header"><span class="meal-icon">💪</span> Pre-entrenamiento</div>
+      <div class="field">
+        <label>¿Comes algo antes de entrenar? ¿Qué y cuánto tiempo antes?</label>
+        <textarea id="pre_entreno" placeholder="Ej: Una pieza de fruta 30 min antes, nada porque entreno en ayunas, tostada 1h antes…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+    <div class="meal-card" id="mc-post">
+      <div class="meal-card-header"><span class="meal-icon">🥤</span> Post-entrenamiento</div>
+      <div class="field">
+        <label>¿Comes algo después de entrenar? ¿Qué?</label>
+        <textarea id="post_entreno" placeholder="Ej: Batido de proteína con plátano, nada porque justo ceno, tortitas de avena con huevo…" style="min-height:70px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card-cena">
+    <div class="card-title">Cena y Snack Nocturno</div>
+    <div class="meal-card" id="mc-cena">
+      <div class="meal-card-header"><span class="meal-icon">🌙</span> Cena habitual</div>
+      <div class="form-grid cols-1">
+        <div class="field">
+          <label>¿Qué sueles cenar?</label>
+          <textarea id="cena_hab" placeholder="Ej: Cena ligera: tortilla francesa con ensalada. A veces pescado al horno con patata o sopa de verduras…"></textarea>
+        </div>
+        <div class="field" id="mc-snack">
+          <label>¿Sueles picar algo después de cenar?</label>
+          <textarea id="picoteo_noche" placeholder="Ej: Onza de chocolate negro, yogur, fruta, nada…" style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Información Extra sobre tus Comidas</div>
+    <div class="field">
+      <label>¿Quieres añadir algo más sobre tus hábitos culinarios o ingestas?
+        <span class="hint">Métodos de cocina, ingestas que dependen de algo externo, si sueles hacer alguna fuera o en restaurantes por trabajo, variaciones según el día…</span>
+      </label>
+      <textarea id="comidas_info_extra" placeholder="Ej: Solo cocino al vapor y a la plancha. La comida del mediodía los martes y jueves la hago en el bar de la empresa. Los días que viajo suelo saltarme la merienda. Preparo batch cooking los domingos para toda la semana…" style="min-height:100px"></textarea>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(5)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(7)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 7 — OBJETIVOS
+════════════════════════════════════════════════ -->
+<section class="step" id="step-7" style="display:none">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div>
+      <div class="step-title">Objetivos y Expectativas</div>
+      <div class="step-desc">¿Qué quieres conseguir y en qué plazo?</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Objetivo Principal</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Cuál es tu objetivo principal? <span class="req">*</span>
+          <span class="hint">Puedes seleccionar varios si se combinan</span>
+        </label>
+        <div class="pill-group">
+          <input type="checkbox" name="objetivo" id="obj-grasa" value="Pérdida de grasa"><label for="obj-grasa">🔥 Pérdida de grasa</label>
+          <input type="checkbox" name="objetivo" id="obj-musculo" value="Ganancia muscular"><label for="obj-musculo">💪 Ganancia muscular</label>
+          <input type="checkbox" name="objetivo" id="obj-recomp" value="Recomposición corporal"><label for="obj-recomp">⚖️ Recomposición corporal</label>
+          <input type="checkbox" name="objetivo" id="obj-mant" value="Mantenimiento"><label for="obj-mant">🎯 Mantenimiento</label>
+          <input type="checkbox" name="objetivo" id="obj-rend" value="Mejora del rendimiento deportivo"><label for="obj-rend">🏃 Rendimiento deportivo</label>
+          <input type="checkbox" name="objetivo" id="obj-salud" value="Mejora de la salud general"><label for="obj-salud">❤️ Salud general</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Tienes objetivos secundarios?
+          <span class="hint">Escribe libremente cualquier objetivo adicional que quieras trabajar</span>
+        </label>
+        <textarea id="obj_sec_otro" placeholder="Ej: Mejorar la digestión, tener más energía por las mañanas, reducir la inflamación, mejorar los niveles de analítica…" style="min-height:80px"></textarea>
+      </div>
+      <div class="field">
+        <label>¿En cuánto tiempo te gustaría ver resultados?</label>
+        <div class="pill-group">
+          <input type="radio" name="plazo" id="pl-6m" value="6 meses"><label for="pl-6m">6 meses</label>
+          <input type="radio" name="plazo" id="pl-1a" value="1 año o más"><label for="pl-1a">1 año o más</label>
+          <input type="radio" name="plazo" id="pl-sin" value="Sin prisa, cambio de hábitos sostenible"><label for="pl-sin">Sin prisa, cambio sostenible</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(6)">← Atrás</button>
+    <button class="btn btn-next" onclick="goStep(8)">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PASO 8 — INFORMACIÓN ADICIONAL
+════════════════════════════════════════════════ -->
+<section class="step" id="step-8" style="display:none">
+  <div class="step-header">
+    <div class="step-num">8</div>
+    <div>
+      <div class="step-title">Información Adicional</div>
+      <div class="step-desc">Últimas preguntas para completar tu perfil nutricional</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Comer Fuera de Casa</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Con qué frecuencia comes fuera de casa (bares, restaurantes, cafeterías…)?</label>
+        <div class="pill-group">
+          <input type="radio" name="come_fuera_frec" id="cf1" value="Casi nunca (< 1 vez/semana)"><label for="cf1">Casi nunca</label>
+          <input type="radio" name="come_fuera_frec" id="cf2" value="1-2 veces por semana"><label for="cf2">1-2 veces/semana</label>
+          <input type="radio" name="come_fuera_frec" id="cf3" value="3-4 veces por semana"><label for="cf3">3-4 veces/semana</label>
+          <input type="radio" name="come_fuera_frec" id="cf4" value="Casi a diario"><label for="cf4">Casi a diario</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Cuándo suele ocurrir habitualmente?</label>
+        <div class="pill-group">
+          <input type="checkbox" name="come_fuera_cuando" id="cfc-semana" value="Entre semana"><label for="cfc-semana">📅 Entre semana</label>
+          <input type="checkbox" name="come_fuera_cuando" id="cfc-finde" value="Fin de semana"><label for="cfc-finde">🎉 Fin de semana</label>
+          <input type="checkbox" name="come_fuera_cuando" id="cfc-ambos" value="Ambos"><label for="cfc-ambos">↔️ Ambos por igual</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Qué tipo de restaurantes o establecimientos frecuentas?
+          <span class="hint">Ej: bar de menú del día, restaurante italiano, kebab, comida rápida, cafetería de empresa…</span>
+        </label>
+        <textarea id="restaurantes_habituales" placeholder="Ej: Bar del trabajo (menú del día L-V), los viernes pizzería con amigos, cafetería Starbucks por la mañana…" style="min-height:70px"></textarea>
+      </div>
+      <div class="field">
+        <label>Cuando comes fuera, ¿en qué momento del día suele ser? Indica cuántas veces a la semana aprox.</label>
+        <div class="form-grid" style="margin-top:8px">
+          <div class="field">
+            <label style="font-weight:500;font-size:12px">🌅 Desayunos fuera</label>
+            <select id="fuera_desayuno">
+              <option value="">Selecciona…</option>
+              <option>Nunca</option>
+              <option>1 vez/semana</option>
+              <option>2-3 veces/semana</option>
+              <option>4-5 veces/semana</option>
+              <option>A diario</option>
+            </select>
+          </div>
+          <div class="field">
+            <label style="font-weight:500;font-size:12px">🍽️ Comidas fuera</label>
+            <select id="fuera_comida">
+              <option value="">Selecciona…</option>
+              <option>Nunca</option>
+              <option>1 vez/semana</option>
+              <option>2-3 veces/semana</option>
+              <option>4-5 veces/semana</option>
+              <option>A diario</option>
+            </select>
+          </div>
+          <div class="field">
+            <label style="font-weight:500;font-size:12px">🌙 Cenas fuera</label>
+            <select id="fuera_cena">
+              <option value="">Selecciona…</option>
+              <option>Nunca</option>
+              <option>1 vez/semana</option>
+              <option>2-3 veces/semana</option>
+              <option>4-5 veces/semana</option>
+              <option>A diario</option>
+            </select>
+          </div>
+          <div class="field">
+            <label style="font-weight:500;font-size:12px">🍌 Meriendas / Snacks fuera</label>
+            <select id="fuera_merienda">
+              <option value="">Selecciona…</option>
+              <option>Nunca</option>
+              <option>1 vez/semana</option>
+              <option>2-3 veces/semana</option>
+              <option>4-5 veces/semana</option>
+              <option>A diario</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Qué sueles pedir cuando comes fuera?
+          <span class="hint">Platos habituales, si pides menú completo, si evitas postres, si controlas algo…</span>
+        </label>
+        <textarea id="fuera_que_comes" placeholder="Ej: Suelo pedir el menú del día completo con postre, en cenas suelo ir a tapas y compartir, en el desayuno café con tostadas con aceite…" style="min-height:70px"></textarea>
+      </div>
+      <div class="field">
+        <label>Información adicional sobre tus comidas fuera de casa
+          <span class="hint">Cualquier detalle que quieras añadir: con quién sueles ir, si te cuesta controlar lo que pides, situaciones especiales…</span>
+        </label>
+        <textarea id="fuera_extra" placeholder="Ej: Entre semana como en el bar de la empresa por falta de tiempo, los fines de semana salgo a cenar con mi pareja y suelo pedir sin preocuparme demasiado. Me cuesta evitar el postre cuando como fuera…" style="min-height:80px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Motivación y Adherencia</div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Qué parte de cambiar tu alimentación te resulta más difícil?</label>
+        <div class="pill-group">
+          <input type="checkbox" name="dificultad" id="df1" value="Planificar y organizar las comidas"><label for="df1">Planificar comidas</label>
+          <input type="checkbox" name="dificultad" id="df2" value="Cocinar con regularidad"><label for="df2">Cocinar</label>
+          <input type="checkbox" name="dificultad" id="df3" value="Resistir antojos y picoteos"><label for="df3">Antojos / picoteo</label>
+          <input type="checkbox" name="dificultad" id="df4" value="Comer bien en eventos sociales"><label for="df4">Eventos sociales</label>
+          <input type="checkbox" name="dificultad" id="df5" value="Falta de tiempo"><label for="df5">Falta de tiempo</label>
+          <input type="checkbox" name="dificultad" id="df6" value="Falta de motivación"><label for="df6">Motivación</label>
+          <input type="checkbox" name="dificultad" id="df7" value="No saber qué comer"><label for="df7">No saber qué comer</label>
+          <input type="checkbox" name="dificultad" id="df8" value="Comer fuera de casa"><label for="df8">Comer fuera</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Qué alimento o comida sientes que NO podrías eliminar de tu dieta?
+          <span class="hint">Es importante saberlo para adaptar el plan a tu realidad</span>
+        </label>
+        <textarea id="no_renuncio" placeholder="Ej: El café de la mañana, el vino del fin de semana, la pizza los viernes, el chocolate después de cenar…" style="min-height:70px"></textarea>
+      </div>
+      <div class="field">
+        <label>¿Usas alguna app para registrar tu comida o actividad actualmente?</label>
+        <div class="pill-group">
+          <input type="checkbox" name="apps" id="app1" value="MyFitnessPal"><label for="app1">MyFitnessPal</label>
+          <input type="checkbox" name="apps" id="app2" value="Cronometer"><label for="app2">Cronometer</label>
+          <input type="checkbox" name="apps" id="app3" value="Yazio"><label for="app3">Yazio</label>
+          <input type="checkbox" name="apps" id="app4" value="Samsung Health"><label for="app4">Samsung Health</label>
+          <input type="checkbox" name="apps" id="app5" value="Apple Health"><label for="app5">Apple Health</label>
+          <input type="checkbox" name="apps" id="app6" value="Garmin / Polar / Fitbit"><label for="app6">Garmin/Polar</label>
+          <input type="checkbox" name="apps" id="app7" value="Ninguna"><label for="app7">Ninguna</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Comidas Fuera de Dieta</div>
+    <div class="info-box">
+      Conocer tus momentos de disfrute habituales me permite <strong>integrarlos en tu plan</strong> en lugar de ignorarlos. No son un problema: son parte de tu realidad y de una dieta sostenible.
+    </div>
+    <div class="form-grid cols-1">
+      <div class="field">
+        <label>¿Tienes comidas o momentos de disfrute que repites cada semana?
+          <span class="hint">Ej: hamburguesa con tu pareja los sábados, merienda de bizcocho los domingos, pizza los viernes…</span>
+        </label>
+        <textarea id="comidas_fuera_dieta" placeholder="Cuéntame qué, cuándo y con quién. Ej:&#10;— Sábados por la noche: ceno hamburguesa con mi novia en un restaurante&#10;— Domingos por la mañana: desayuno tortitas o tostadas con mermelada&#10;— Viernes mediodía: bocadillo o menú del trabajo con mis compañeros" style="min-height:110px"></textarea>
+      </div>
+      <div class="field">
+        <label>¿Cómo te sientes respecto a esas comidas?</label>
+        <div class="pill-group">
+          <input type="radio" name="sentimiento_extras" id="se1" value="Las disfruto sin culpa"><label for="se1">Las disfruto sin culpa 😊</label>
+          <input type="radio" name="sentimiento_extras" id="se2" value="Las disfruto pero me genera culpa"><label for="se2">Me genera algo de culpa 😐</label>
+          <input type="radio" name="sentimiento_extras" id="se3" value="Me cuesta controlarme después"><label for="se3">Me cuesta retomar después 😔</label>
+          <input type="radio" name="sentimiento_extras" id="se4" value="Siento que me descontrolo los fines de semana"><label for="se4">Me descontrolo el fin de semana 😬</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Comentarios Libres</div>
+    <div class="field">
+      <label>¿Hay algo más que quieras que sepa sobre ti, tu estilo de vida o tus necesidades nutricionales?</label>
+      <textarea id="comentarios_libres" placeholder="Cualquier información adicional que consideres relevante para tu plan nutricional…" style="min-height:120px"></textarea>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" onclick="goStep(7)">← Atrás</button>
+    <button class="btn btn-submit" onclick="submitForm()">✓ Enviar cuestionario</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     RESUMEN FINAL
+════════════════════════════════════════════════ -->
+<div id="summary-view">
+  <div class="success-banner">
+    <div class="success-icon">🌿</div>
+    <h2>¡Cuestionario completado!</h2>
+    <p>Revisa el resumen a continuación y después envíamelo en PDF pulsando el botón.</p>
+  </div>
+
+  <!-- Cabecera que sólo aparece dentro del PDF generado -->
+  <div id="pdf-header">
+    <div style="background:#3d6b4f;color:#fff;padding:24px 32px;border-radius:12px;margin-bottom:24px">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.7;margin-bottom:6px">Plan Nutricional Personalizado</div>
+      <div style="font-size:26px;font-weight:600;font-family:Georgia,serif">Cuestionario Inicial</div>
+      <div id="pdf-nombre-fecha" style="font-size:13px;opacity:.8;margin-top:6px"></div>
+    </div>
+  </div>
+
+  <div id="summary-content"></div>
+
+  <!-- Bloque de envío -->
+  <div class="envio-wrap">
+    <button class="btn-enviar" id="btn-enviar" onclick="generarYEnviar()">
+      📄 Generar PDF y enviar al nutricionista
+    </button>
+
+    <div class="envio-panel" id="envio-panel">
+      <div class="envio-panel-title">✅ ¡Ya casi está! Sigue estos pasos:</div>
+      <div class="envio-steps">
+        <div class="envio-step">
+          <div class="envio-step-num done">1</div>
+          <div class="envio-step-body">
+            <strong>Dos archivos descargados automáticamente</strong>
+            <span>En tu carpeta de Descargas encontrarás: <em>Cuestionario_Nutricional_TuNombre.pdf</em> (para ti, resumen del cuestionario) y <em>datos_paciente_TuNombre.json</em> (para el nutricionista). Envía <strong>ambos archivos</strong> a tu nutricionista.</span>
+          </div>
+        </div>
+        <div class="envio-step">
+          <div class="envio-step-num pending">2</div>
+          <div class="envio-step-body">
+            <strong>Abre tu correo y adjunta el PDF guardado</strong>
+            <span>Pulsa el botón de abajo. Se abrirá tu aplicación de correo con el asunto y destinatario ya rellenados. Adjunta el PDF y pulsa Enviar.</span>
+          </div>
+        </div>
+        <div class="envio-step">
+          <div class="envio-step-num waiting">3</div>
+          <div class="envio-step-body">
+            <strong>Tu nutricionista recibirá tu cuestionario</strong>
+            <span>En breve se pondrá en contacto contigo para comenzar con tu plan personalizado.</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-open-mail" id="btn-mail" onclick="abrirCorreo()">
+        ✉️ Abrir correo para enviar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── STATE ──────────────────────────────────────
+let currentStep = 1;
+const totalSteps = 8;
+let activityCount = 1;
+let diasTipoCount = 0;
+
+// ── COMPREHENSIVE SPORT LIST ───────────────────
+const SPORTS_DB = [
+  { g: 'Fuerza y musculación', items: ['Musculación / Pesas','Halterofilia','Powerlifting','Calistenia / Street workout','CrossFit','Entrenamiento funcional','Kettlebell','TRX / Suspensión','Isometría','Trabajo de core','Entrenamiento en circuito','Strongman'] },
+  { g: 'Cardio y resistencia', items: ['Correr — ritmo suave (< 8 km/h)','Correr — ritmo moderado (8-10 km/h)','Correr — ritmo rápido (> 10 km/h)','Triatlón','Ciclismo en ruta','Ciclismo MTB / Gravel','Ciclismo indoor / Spinning','Natación','Natación sincronizada','Remo (ergómetro)','Kayak / Piragüismo','Senderismo / Trekking','Marcha atlética','Elíptica','Escaladora / Step','Nordic walking'] },
+  { g: 'Deportes de equipo', items: ['Fútbol','Fútbol sala','Baloncesto','Voleibol','Voleibol playa','Balonmano','Hockey hierba','Hockey sala','Rugby','Rugby 7','Fútbol americano','Béisbol / Sóftbol','Waterpolo','Ultimate Frisbee'] },
+  { g: 'Deportes de raqueta', items: ['Tenis','Pádel','Bádminton','Tenis de mesa / Ping pong','Squash','Pickleball','Frontenis'] },
+  { g: 'Deportes de combate', items: ['Boxeo','Kickboxing','Muay Thai','MMA / Artes marciales mixtas','Judo','Karate','Taekwondo','Lucha libre / Greco-romana','Brazilian Jiu-Jitsu','Esgrima','Aikido','Kendo'] },
+  { g: 'Atletismo', items: ['Velocidad / Sprints','Medio fondo (800-1500m)','Fondo (5k-10k)','Maratón','Trail running / Montaña','Saltos (longitud, altura, pértiga)','Lanzamientos (peso, disco, jabalina)','Obstáculos / Vallas','Decatlón / Pentatlón'] },
+  { g: 'Deportes acuáticos', items: ['Surf','Bodyboard','Paddle surf (SUP)','Vela','Windsurf','Kitesurf','Wakeboard','Esquí acuático'] },
+  { g: 'Deportes de invierno', items: ['Esquí alpino','Esquí de fondo','Snowboard','Patinaje sobre hielo','Hockey hielo','Biatlón'] },
+  { g: 'Mente y cuerpo', items: ['Yoga','Yoga caliente (Bikram)','Pilates (mat)','Pilates (máquina / Reformer)','Tai Chi','Meditación activa','Qi Gong'] },
+  { g: 'Danza y arte', items: ['Baile deportivo','Danza clásica / Ballet','Zumba / Aeróbic','Hip hop / Urbano','Flamenco','Pole dance / Fitness'] },
+  { g: 'Otros deportes', items: ['Escalada / Boulder','Parkour','Patinaje en línea','Golf','Equitación','Tiro con arco','Natación con aletas','Gimnasia artística / Rítmica','Crossminton','Tchoukball','Béisbol','Criquet'] },
+];
+
+// ── SPORT SEARCH FUNCTIONS ─────────────────────
+function buildSportDropdown(container, input, hiddenInput) {
+  container.innerHTML = '';
+  const q = (input.value || '').toLowerCase().trim();
+  let shown = 0;
+  SPORTS_DB.forEach(group => {
+    const filtered = q ? group.items.filter(s => s.toLowerCase().includes(q)) : group.items;
+    if (!filtered.length) return;
+    const gl = document.createElement('div');
+    gl.className = 'sport-group-label';
+    gl.textContent = group.g;
+    container.appendChild(gl);
+    filtered.forEach(sport => {
+      const opt = document.createElement('div');
+      opt.className = 'sport-option';
+      opt.textContent = sport;
+      opt.onmousedown = (e) => { e.preventDefault(); seleccionarDeporte(input, hiddenInput, container, sport); };
+      container.appendChild(opt);
+      shown++;
+    });
+  });
+  if (!shown) {
+    const noRes = document.createElement('div');
+    noRes.className = 'sport-option';
+    noRes.style.color = 'var(--gray)';
+    noRes.style.fontStyle = 'italic';
+    noRes.textContent = 'No encontrado — se guardará lo que escribas';
+    container.appendChild(noRes);
+  }
+  container.style.display = 'block';
+}
+
+function filtrarDeportes(input) {
+  const wrap = input.closest('.sport-search-wrap');
+  const dropdown = wrap.querySelector('.sport-dropdown');
+  const hiddenInput = wrap.querySelector('.act-tipo-val');
+  buildSportDropdown(dropdown, input, hiddenInput);
+}
+
+function abrirDropdown(input) {
+  const wrap = input.closest('.sport-search-wrap');
+  const dropdown = wrap.querySelector('.sport-dropdown');
+  const hiddenInput = wrap.querySelector('.act-tipo-val');
+  buildSportDropdown(dropdown, input, hiddenInput);
+}
+
+function seleccionarDeporte(input, hiddenInput, dropdown, sport) {
+  input.value = sport;
+  hiddenInput.value = sport;
+  dropdown.style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  document.querySelectorAll('.sport-dropdown').forEach(d => {
+    if (!d.closest('.sport-search-wrap').contains(e.target)) d.style.display = 'none';
+  });
+});
+
+// ── SITUACIÓN LABORAL (condicional) ──────────
+function toggleSituacionLaboral() {
+  const val = document.querySelector('input[name="situacion_laboral"]:checked')?.value || '';
+  const showTrabajo = val === 'Trabajo' || val === 'Trabajo y estudio';
+  const showEstudio = val === 'Estudio' || val === 'Trabajo y estudio';
+  const showExtra   = showTrabajo || showEstudio;
+  document.getElementById('bloque-trabajo').style.display       = showTrabajo ? 'block' : 'none';
+  document.getElementById('bloque-estudio').style.display       = showEstudio ? 'block' : 'none';
+  document.getElementById('bloque-extra-laboral').style.display = showExtra   ? 'block' : 'none';
+}
+
+function toggleEstudioModalidad() {
+  const val = document.querySelector('input[name="estudio_modalidad"]:checked')?.value || '';
+  document.getElementById('bloque-estudio-pres').style.display   = (val === 'Presencial' || val === 'Mixto') ? 'block' : 'none';
+  document.getElementById('bloque-estudio-online').style.display = (val === 'Online'     || val === 'Mixto') ? 'block' : 'none';
+}
+
+// ── HORARIO LABORAL (condicional) ─────────────
+function toggleHorarioTipo() {
+  const tipo = document.querySelector('input[name="horario_tipo"]:checked')?.value || '';
+  document.getElementById('bloque-fijo').style.display    = tipo === 'Horario fijo'        ? 'block' : 'none';
+  document.getElementById('bloque-turnos').style.display  = tipo === 'Turnos rotativos'    ? 'block' : 'none';
+  document.getElementById('bloque-partido').style.display = tipo === 'Horario partido'     ? 'block' : 'none';
+  document.getElementById('bloque-auto').style.display    = tipo === 'Autónomo / variable' ? 'block' : 'none';
+}
+
+// ── CONDICIONALES GENÉRICOS ───────────────────
+// Muestra/oculta detEl según si radioId está checked
+function toggleCondicional(radioId, detEl) {
+  const radio = document.getElementById(radioId);
+  const det   = document.getElementById(detEl);
+  if (!radio || !det) return;
+  det.style.display = radio.checked ? 'block' : 'none';
+}
+
+// ── COME EN EL TRABAJO (condicional multi-ingesta) ───
+function toggleComeTrabajo() {
+  const val = document.querySelector('input[name="come_trabajo_yn"]:checked')?.value;
+  const siBlock = document.getElementById('come-trabajo-si');
+  if (val === 'Sí') {
+    siBlock.style.display = 'block';
+    sugerirIngestasTrabajo();
+  } else {
+    siBlock.style.display = 'none';
+    // Reset all meal checkboxes and their details
+    ['desayuno','almuerzo','comida','merienda','cena'].forEach(m => {
+      const cb = document.getElementById('tc-' + m);
+      if (cb) cb.checked = false;
+      const det = document.getElementById('tc-det-' + m);
+      if (det) det.style.display = 'none';
+    });
+  }
+}
+
+function sugerirIngestasTrabajo() {
+  // Read work start/end from the active schedule type
+  const horTipo = document.querySelector('input[name="horario_tipo"]:checked')?.value || '';
+  let ini = '', fin = '';
+  if (horTipo === 'Horario fijo') {
+    ini = document.getElementById('trabajo_inicio')?.value || '';
+    fin = document.getElementById('trabajo_fin')?.value    || '';
+  } else if (horTipo === 'Horario partido') {
+    ini = document.getElementById('partido_man_ini')?.value || '';
+    fin = document.getElementById('partido_tar_fin')?.value || '';
+  } else if (horTipo === 'Turnos rotativos') {
+    // Use first checked shift
+    [['tur-man','tur-man-ini','tur-man-fin'],
+     ['tur-tar','tur-tar-ini','tur-tar-fin'],
+     ['tur-noch','tur-noch-ini','tur-noch-fin']].forEach(([chk,i,f]) => {
+      if (document.getElementById(chk)?.checked && !ini) {
+        ini = document.getElementById(i)?.value || '';
+        fin = document.getElementById(f)?.value || '';
+      }
+    });
+  }
+
+  if (!ini || !fin) return; // no schedule info to suggest from
+
+  const toH = t => { const [h,m] = t.split(':').map(Number); return h + m/60; };
+  const startH = toH(ini), endH = toH(fin);
+
+  const SUGGESTIONS = [
+    { id: 'tc-desayuno',  from: 5,  to: 10, label: 'Desayuno' },
+    { id: 'tc-almuerzo',  from: 9,  to: 13, label: 'Almuerzo' },
+    { id: 'tc-comida',    from: 12, to: 16, label: 'Comida'   },
+    { id: 'tc-merienda',  from: 15, to: 19, label: 'Merienda' },
+    { id: 'tc-cena',      from: 19, to: 25, label: 'Cena'     },
+  ];
+
+  const suggested = SUGGESTIONS.filter(s => startH < s.to && endH > s.from).map(s => s.label);
+
+  const hint = document.getElementById('trabajo-horario-hint');
+  if (hint) {
+    if (suggested.length) {
+      hint.style.display = 'block';
+      hint.innerHTML = `<strong>💡 Según tu horario (${ini}–${fin})</strong> te sugerimos marcar: <strong>${suggested.join(', ')}</strong>`;
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+}
+
+function toggleTrabajoComidasDet(checkboxId, mealKey) {
+  const cb  = document.getElementById(checkboxId);
+  const det = document.getElementById('tc-det-' + mealKey);
+  if (!cb || !det) return;
+  det.style.display = cb.checked ? 'block' : 'none';
+  if (!cb.checked) {
+    // Reset sub-choices when unchecked
+    document.querySelectorAll(`input[name="ctm-${mealKey}"]`).forEach(r => r.checked = false);
+    document.getElementById(`ctm-det-${mealKey}-tupper`).style.display = 'none';
+    document.getElementById(`ctm-det-${mealKey}-rest`).style.display   = 'none';
+  }
+}
+
+function toggleTrabajoComidasModo(mealKey) {
+  const val = document.querySelector(`input[name="ctm-${mealKey}"]:checked`)?.value || '';
+  document.getElementById(`ctm-det-${mealKey}-tupper`).style.display = val === 'Tupper'            ? 'block' : 'none';
+  document.getElementById(`ctm-det-${mealKey}-rest`).style.display   = val === 'Restaurante / bar' ? 'block' : 'none';
+}
+
+// ── Helper: get checked trabajo meals (for construirSemana) ──
+function getTrabajoMeals() {
+  return [...document.querySelectorAll('input[name="trabajo_comidas"]:checked')].map(cb => cb.value);
+}
+
+// ── Helper: get work days from current schedule type ──
+function getWorkDays() {
+  const horTipo = document.querySelector('input[name="horario_tipo"]:checked')?.value || '';
+  if (horTipo === 'Horario fijo') return [...document.querySelectorAll('input[name="ht-fijo-dias"]:checked')].map(c => c.value);
+  if (horTipo === 'Horario partido') return [...document.querySelectorAll('input[name="ht-partido-dias"]:checked')].map(c => c.value);
+  if (horTipo === 'Turnos rotativos') return DIAS_SEMANA; // all days possible
+  return [];
+}
+
+// ── ACTIVITIES ────────────────────────────────
+function removeActivity(btn) { btn.closest('.activity-block').remove(); }
+
+function activityBlockHTML(id) {
+  const days = ['L','M','X','J','V','S','D'];
+  const dayNames = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const daysHtml = days.map((d, i) => `
+    <input type="checkbox" id="act${id}-${d.toLowerCase()}" value="${dayNames[i]}">
+    <label for="act${id}-${d.toLowerCase()}">${d}</label>`).join('');
+  return `
+    <button type="button" class="remove-btn" onclick="removeActivity(this)" title="Eliminar">×</button>
+    <div class="form-grid">
+      <div class="field full">
+        <label>Tipo de ejercicio o deporte</label>
+        <div class="sport-search-wrap">
+          <input type="text" class="sport-search-input" placeholder="🔍 Busca o escribe el deporte / actividad…"
+            oninput="filtrarDeportes(this)" onfocus="abrirDropdown(this)" autocomplete="off">
+          <div class="sport-dropdown" style="display:none"></div>
+          <input type="hidden" class="act-tipo-val">
+        </div>
+      </div>
+      <div class="field">
+        <label>Modalidad</label>
+        <div class="pill-group">
+          <input type="radio" name="act-modalidad-${id}" id="am${id}-ent" value="Entrenamiento">
+          <label for="am${id}-ent">🏋️ Entrenamiento</label>
+          <input type="radio" name="act-modalidad-${id}" id="am${id}-comp" value="Competición">
+          <label for="am${id}-comp">🏆 Competición</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Intensidad percibida (RPE)</label>
+        <select class="act-intensidad">
+          <option value="">Selecciona…</option>
+          <option>Baja (1-3): conversación fácil</option>
+          <option>Moderada (4-6): algo de fatiga</option>
+          <option>Alta (7-8): difícil hablar</option>
+          <option>Máxima (9-10): no puedo más</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hora de inicio → fin</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="time" class="act-inicio" style="flex:1">
+          <span style="color:var(--gray);font-size:13px">→</span>
+          <input type="time" class="act-fin" style="flex:1">
+        </div>
+      </div>
+      <div class="field full">
+        <label>¿Qué días realizas esta actividad?</label>
+        <div class="days-check">${daysHtml}</div>
+      </div>
+    </div>`;
+}
+
+function addActivity() {
+  activityCount++;
+  const container = document.getElementById('actividades-container');
+  const block = document.createElement('div');
+  block.className = 'activity-block';
+  block.id = 'act-' + activityCount;
+  block.innerHTML = activityBlockHTML(activityCount);
+  container.appendChild(block);
+}
+
+// ── WEEK BUILDER ──────────────────────────────
+const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const MEAL_OPTIONS = ['🌅 Desayuno','☕ Almuerzo / Media mañana','🍽️ Comida','🍌 Merienda','🏋️ Pre-entrenamiento','🥤 Post-entrenamiento','🌙 Cena','🍫 Snack nocturno','Otro'];
+
+function construirSemana() {
+  // ── Read activities from step 3 ──
+  const actsByDay = {};
+  DIAS_SEMANA.forEach(d => actsByDay[d] = []);
+
+  document.querySelectorAll('.activity-block').forEach(b => {
+    const tipo = b.querySelector('.act-tipo-val')?.value ||
+                 b.querySelector('.sport-search-input')?.value || '';
+    const modalidad = b.querySelector('input[name^="act-modalidad"]:checked')?.value || '';
+    const inicio = b.querySelector('.act-inicio')?.value || '';
+    const fin    = b.querySelector('.act-fin')?.value    || '';
+    [...b.querySelectorAll('.days-check input:checked')].forEach(c => {
+      const d = c.value;
+      if (actsByDay[d] !== undefined && tipo)
+        actsByDay[d].push({ tipo, modalidad, inicio, fin });
+    });
+  });
+
+  // ── Read work schedule from step 3 ──
+  const situacion   = document.querySelector('input[name="situacion_laboral"]:checked')?.value || '';
+  const horarioTipo = document.querySelector('input[name="horario_tipo"]:checked')?.value    || '';
+  const workByDay   = {};
+  DIAS_SEMANA.forEach(d => workByDay[d] = []);
+
+  const addWork = (dias, label, ini, fin) => {
+    dias.forEach(d => { if (workByDay[d]) workByDay[d].push({ label, ini, fin }); });
+  };
+
+  if (situacion === 'Trabajo' || situacion === 'Trabajo y estudio') {
+    if (horarioTipo === 'Horario fijo') {
+      const dias = [...document.querySelectorAll('input[name="ht-fijo-dias"]:checked')].map(c => c.value);
+      const ini  = document.getElementById('trabajo_inicio')?.value || '';
+      const fin  = document.getElementById('trabajo_fin')?.value    || '';
+      addWork(dias, '💼 Trabajo', ini, fin);
+    } else if (horarioTipo === 'Horario partido') {
+      const dias = [...document.querySelectorAll('input[name="ht-partido-dias"]:checked')].map(c => c.value);
+      const mIni = document.getElementById('partido_man_ini')?.value || '';
+      const mFin = document.getElementById('partido_man_fin')?.value || '';
+      const tIni = document.getElementById('partido_tar_ini')?.value || '';
+      const tFin = document.getElementById('partido_tar_fin')?.value || '';
+      if (mIni) addWork(dias, '💼 Trabajo (mañana)', mIni, mFin);
+      if (tIni) addWork(dias, '💼 Trabajo (tarde)',  tIni, tFin);
+    } else if (horarioTipo === 'Turnos rotativos') {
+      [
+        { chk: 'tur-man',  ini: 'tur-man-ini',  fin: 'tur-man-fin',  lbl: '💼 Turno mañana'  },
+        { chk: 'tur-tar',  ini: 'tur-tar-ini',  fin: 'tur-tar-fin',  lbl: '💼 Turno tarde'   },
+        { chk: 'tur-noch', ini: 'tur-noch-ini', fin: 'tur-noch-fin', lbl: '💼 Turno noche'   },
+      ].filter(s => document.getElementById(s.chk)?.checked).forEach(s => {
+        const ini = document.getElementById(s.ini)?.value || '';
+        const fin = document.getElementById(s.fin)?.value || '';
+        addWork(DIAS_SEMANA, s.lbl, ini, fin); // rotativo: all days possible
+      });
+    }
+  }
+
+  // ── Read study schedule ──
+  const modalidadEstudio = document.querySelector('input[name="estudio_modalidad"]:checked')?.value || '';
+  if (situacion === 'Estudio' || situacion === 'Trabajo y estudio') {
+    if (modalidadEstudio === 'Presencial' || modalidadEstudio === 'Mixto') {
+      const dias = [...document.querySelectorAll('input[name="est-pres-dias"]:checked')].map(c => c.value);
+      const ini  = document.getElementById('clase_inicio')?.value || '';
+      const fin  = document.getElementById('clase_fin')?.value    || '';
+      addWork(dias, '📚 Clases', ini, fin);
+    }
+  }
+
+  // ── Render each day ──
+  DIAS_SEMANA.forEach(dia => {
+    const refEl = document.getElementById('dia-ref-' + dia);
+    if (!refEl) return;
+    let html = '';
+
+    workByDay[dia].forEach(w => {
+      const horario = (w.ini && w.fin) ? ` ${w.ini}–${w.fin}` : '';
+      html += `<span class="dia-tag" style="background:#c8763a;color:#fff">${w.label}${horario}</span>`;
+    });
+
+    actsByDay[dia].forEach(a => {
+      const isComp  = a.modalidad === 'Competición';
+      const color   = isComp ? '#8b1a1a' : '#3d6b4f';
+      const icon    = isComp ? '🏆' : '🏋️';
+      const horario = (a.inicio && a.fin) ? ` ${a.inicio}–${a.fin}` : '';
+      const nombre  = a.tipo.length > 28 ? a.tipo.substring(0,26) + '…' : a.tipo;
+      html += `<span class="dia-tag" style="background:${color};color:#fff">${icon} ${nombre}${horario}</span>`;
+    });
+
+    if (!html) html = '<span class="dia-ref-empty">😴 Sin actividades — día de descanso</span>';
+    refEl.innerHTML = html;
+  });
+
+  // ── Pre-populate work meals into work days ──────────
+  const comeEnTrabajo = document.querySelector('input[name="come_trabajo_yn"]:checked')?.value;
+  if (comeEnTrabajo === 'Sí') {
+    const workMeals = getTrabajoMeals();
+    const workDays  = getWorkDays();
+    const opts = MEAL_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
+
+    workDays.forEach(dia => {
+      const mealsEl = document.getElementById('dia-meals-' + dia);
+      if (!mealsEl || mealsEl.children.length > 0) return; // skip if already has meals
+
+      workMeals.forEach(meal => {
+        const row = document.createElement('div');
+        row.className = 'dia-meal-row';
+        row.innerHTML = `
+          <select>${opts}</select>
+          <input type="time">
+          <button type="button" class="dia-meal-remove" onclick="this.closest('.dia-meal-row').remove()" title="Eliminar">×</button>`;
+        mealsEl.appendChild(row);
+        // Set the correct meal type
+        row.querySelector('select').value = meal;
+      });
+    });
+
+    if (workMeals.length && workDays.length) detectarDiasSimilares();
+  }
+
+  // Detect and highlight similar days after rendering
+  detectarDiasSimilares();
+}
+
+function addDiaMeal(dia) {
+  const container = document.getElementById('dia-meals-' + dia);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'dia-meal-row';
+  const opts = MEAL_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
+  row.innerHTML = `
+    <select>${opts}</select>
+    <input type="time">
+    <button type="button" class="dia-meal-remove" onclick="this.closest('.dia-meal-row').remove()" title="Eliminar">×</button>`;
+  container.appendChild(row);
+  // Show copy button if this day has similar days
+  detectarDiasSimilares();
+}
+
+// ── SIMILARITY ENGINE ──────────────────────────
+function getDayFingerprint(dia) {
+  const refEl = document.getElementById('dia-ref-' + dia);
+  if (!refEl) return '';
+  // Extract and sort all tag texts to make comparison order-independent
+  const tags = [...refEl.querySelectorAll('.dia-tag')]
+    .map(t => t.textContent.trim())
+    .sort()
+    .join('|');
+  return tags;
+}
+
+function detectarDiasSimilares() {
+  // Build fingerprint map
+  const fingerprints = {};
+  DIAS_SEMANA.forEach(d => { fingerprints[d] = getDayFingerprint(d); });
+
+  // Group days by fingerprint
+  const groups = {}; // fingerprint → [dias]
+  DIAS_SEMANA.forEach(d => {
+    const fp = fingerprints[d];
+    if (!fp) return; // day has no activities yet (not loaded)
+    if (!groups[fp]) groups[fp] = [];
+    groups[fp].push(d);
+  });
+
+  // Update each day card
+  DIAS_SEMANA.forEach(dia => {
+    const fp      = fingerprints[dia];
+    const banner  = document.getElementById('dia-similares-banner-' + dia);
+    const copyBtn = document.getElementById('dia-copy-' + dia);
+    const card    = document.getElementById('dia-card-' + dia);
+    if (!banner || !copyBtn || !card) return;
+
+    const group   = (groups[fp] || []).filter(d => d !== dia);
+    const hasMeals = document.querySelectorAll(`#dia-meals-${dia} .dia-meal-row`).length > 0;
+
+    if (group.length > 0) {
+      const nombres = group.join(', ');
+      banner.innerHTML = `<strong>⚡ Día similar:</strong> ${nombres} tiene las mismas actividades. Rellena las ingestas aquí y cópialas automáticamente.`;
+      banner.classList.add('visible');
+      card.classList.add('similar-highlight');
+      // Show copy button only if this day has at least one meal
+      copyBtn.classList.toggle('visible', hasMeals);
+    } else {
+      banner.innerHTML = '';
+      banner.classList.remove('visible');
+      card.classList.remove('similar-highlight');
+      copyBtn.classList.remove('visible');
+    }
+  });
+}
+
+function copiarIngestasASimilares(dia) {
+  const fp    = getDayFingerprint(dia);
+  if (!fp) return;
+
+  // Find similar days (same fingerprint, different day)
+  const fingerprints = {};
+  DIAS_SEMANA.forEach(d => { fingerprints[d] = getDayFingerprint(d); });
+  const targets = DIAS_SEMANA.filter(d => d !== dia && fingerprints[d] === fp);
+
+  if (!targets.length) return;
+
+  // Read source meals
+  const sourceMeals = [...document.querySelectorAll(`#dia-meals-${dia} .dia-meal-row`)].map(r => ({
+    tipo: r.querySelector('select')?.value || '',
+    hora: r.querySelector('input[type="time"]')?.value || '',
+  }));
+
+  if (!sourceMeals.length) return;
+
+  const opts = MEAL_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
+
+  targets.forEach(target => {
+    const container = document.getElementById('dia-meals-' + target);
+    if (!container) return;
+    container.innerHTML = ''; // clear existing
+    sourceMeals.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'dia-meal-row';
+      row.innerHTML = `
+        <select>${opts}</select>
+        <input type="time">
+        <button type="button" class="dia-meal-remove" onclick="this.closest('.dia-meal-row').remove()" title="Eliminar">×</button>`;
+      container.appendChild(row);
+      // Set values after appending
+      row.querySelector('select').value = m.tipo;
+      row.querySelector('input[type="time"]').value = m.hora;
+    });
+  });
+
+  // Visual feedback
+  targets.forEach(t => {
+    const card = document.getElementById('dia-card-' + t);
+    if (card) {
+      card.style.transition = 'background .3s';
+      card.style.background = '#eaf2ec';
+      setTimeout(() => { card.style.background = ''; }, 1000);
+    }
+  });
+
+  // Update banner to reflect copy was done
+  const banner = document.getElementById('dia-similares-banner-' + dia);
+  if (banner) {
+    banner.innerHTML = `<strong>✅ Ingestas copiadas a:</strong> ${targets.join(', ')}`;
+  }
+}
+
+// ── DIAS TIPO SUMMARY (updated for week builder) ──
+function getDiasTipoSummary() {
+  let out = [];
+  DIAS_SEMANA.forEach(dia => {
+    const refEl   = document.getElementById('dia-ref-'   + dia);
+    const mealsEl = document.getElementById('dia-meals-' + dia);
+    if (!refEl || !mealsEl) return;
+
+    const tags  = [...refEl.querySelectorAll('.dia-tag')].map(t => t.textContent.trim()).join(' · ');
+    const meals = [...mealsEl.querySelectorAll('.dia-meal-row')].map(r => {
+      const tipo = r.querySelector('select')?.value  || '';
+      const hora = r.querySelector('input[type="time"]')?.value || '';
+      return hora ? `${tipo} (${hora})` : tipo;
+    }).filter(Boolean).join(' · ');
+
+    if (tags || meals) {
+      let entry = `<strong>${dia}</strong>`;
+      if (tags)  entry += `<br>📌 ${tags}`;
+      if (meals) entry += `<br>🍴 ${meals}`;
+      out.push(entry);
+    }
+  });
+  return out.join('<br><br>') || '—';
+}
+function getChecked(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value).join(', ') || '—';
+}
+function getVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return '—';
+  return el.value.trim() || '—';
+}
+function getRadio(name) {
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || '—';
+}
+function getRangeVal(id) {
+  return document.getElementById(id)?.value || '—';
+}
+
+// ── ACTIVITIES SUMMARY ────────────────────────
+function getActivitiesSummary() {
+  const blocks = document.querySelectorAll('.activity-block');
+  if (!blocks.length) return '—';
+  let out = [];
+  blocks.forEach((b, i) => {
+    const tipo = b.querySelector('.act-tipo-val')?.value || b.querySelector('.sport-search-input')?.value || '—';
+    const modalidad = b.querySelector(`input[name^="act-modalidad"]:checked`)?.value || '';
+    const rpe = b.querySelector('.act-intensidad')?.value || '';
+    const inicio = b.querySelector('.act-inicio')?.value || '';
+    const fin = b.querySelector('.act-fin')?.value || '';
+    const horario = (inicio && fin) ? `${inicio}–${fin}` : inicio || fin || '—';
+    const dias = [...b.querySelectorAll('.days-check input:checked')].map(c => c.value).join(', ');
+    if (tipo && tipo !== '—') out.push(`${i+1}. ${tipo}${modalidad?' · '+modalidad:''} | ${rpe} | ${horario} | Días: ${dias||'—'}`);
+  });
+  return out.join('<br>') || '—';
+}
+
+// ── DIAS TIPO SUMMARY ─────────────────────────
+function getDiasTipoSummary() {
+  const blocks = document.querySelectorAll('.dt-block');
+  if (!blocks.length) return '—';
+  let out = [];
+  blocks.forEach((b, i) => {
+    const tag = b.querySelector('.dt-tag')?.textContent || '';
+    const name = b.querySelector('.dt-name-input')?.value?.trim() || '';
+    const header = `${tag}${name ? ' — ' + name : ''}`;
+    const days = [...b.querySelectorAll('input[name^="dt"][name$="-day"]:checked')].map(c => c.value).join(', ');
+    const meals = [...b.querySelectorAll('.dt-meal-row')].map(r => {
+      const tipo = r.querySelector('select')?.value || '';
+      const hora = r.querySelector('input[type="time"]')?.value || '';
+      return hora ? `${tipo} (${hora})` : tipo;
+    }).filter(Boolean);
+    const obs = b.querySelector('.dt-obs')?.value?.trim() || '';
+    let entry = `<strong>${i+1}. ${header}</strong>`;
+    if (days) entry += `<br>📅 ${days}`;
+    if (meals.length) entry += `<br>🍴 ${meals.join(' · ')}`;
+    if (obs) entry += `<br>💬 ${obs}`;
+    out.push(entry);
+  });
+  return out.join('<br><br>') || '—';
+}
+
+// ── GANTT BUILDER ─────────────────────────────
+
+// ── PDF VISUAL ENGINE ─────────────────────────
+
+// Colour palette (shared between gantt + pdf sections)
+const PDF_COLORS = {
+  sage:    '#3d6b4f',
+  sagePal: '#eaf2ec',
+  amber:   '#c8763a',
+  amberPal:'#fdf3ea',
+  red:     '#8b1a1a',
+  redPal:  '#fdf0f0',
+  blue:    '#2c5fa8',
+  bluePal: '#eef2fa',
+  gray:    '#6b7b70',
+  grayPal: '#f5f7f5',
+  ink:     '#1e2820',
+  border:  '#d4ddd6',
+};
+
+function pTag(bg, color='#fff', text='') {
+  return `<span style="display:inline-flex;align-items:center;background:${bg};color:${color};border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;margin:2px;white-space:nowrap">${text}</span>`;
+}
+
+function pChip(text, bg, color='#fff') {
+  return `<span style="display:inline-block;background:${bg};color:${color};border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;margin:2px">${text}</span>`;
+}
+
+function pCard(title, content, accent) {
+  accent = accent || PDF_COLORS.sage;
+  return `<div style="border:1.5px solid ${PDF_COLORS.border};border-left:4px solid ${accent};border-radius:10px;padding:14px 18px;margin-bottom:12px;background:#fff;page-break-inside:avoid">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:${accent};margin-bottom:10px">${title}</div>
+    ${content}
+  </div>`;
+}
+
+function pRow(label, value) {
+  if (!value || value === '—') return '';
+  return `<div style="display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid #f0f0f0;padding:5px 0;font-size:12px">
+    <div style="color:${PDF_COLORS.gray};font-weight:600">${label}</div>
+    <div style="color:${PDF_COLORS.ink}">${value}</div>
+  </div>`;
+}
+
+// ── WEEKLY SCHEDULE VISUAL ────────────────────
+function buildWeeklyScheduleHTML() {
+  const ABREV = { 'Lunes':'L','Martes':'M','Miércoles':'X','Jueves':'J','Viernes':'V','Sábado':'S','Domingo':'D' };
+  const BADGE  = { 'L':PDF_COLORS.sage,'M':PDF_COLORS.sage,'X':PDF_COLORS.sage,'J':PDF_COLORS.sage,
+                   'V':PDF_COLORS.sage,'S':'#5a8a6a','D':PDF_COLORS.gray };
+
+  let rows = '';
+  DIAS_SEMANA.forEach((dia, idx) => {
+    const refEl   = document.getElementById('dia-ref-' + dia);
+    const mealsEl = document.getElementById('dia-meals-' + dia);
+    const abrev   = ABREV[dia] || dia[0];
+    const badgeC  = BADGE[abrev] || PDF_COLORS.sage;
+    const isLast  = idx === DIAS_SEMANA.length - 1;
+
+    // Activity tags
+    const tags = refEl ? [...refEl.querySelectorAll('.dia-tag')].map(t => ({
+      text: t.textContent.trim(), bg: t.style.background,
+    })) : [];
+    const tagsHTML = tags.length
+      ? tags.map(t => `<span style="display:inline-block;background:${t.bg||PDF_COLORS.sage};color:#fff;border-radius:99px;padding:3px 10px;font-size:10px;font-weight:700;margin:2px 2px;white-space:nowrap">${t.text}</span>`).join('')
+      : `<span style="display:inline-block;background:${PDF_COLORS.grayPal};color:${PDF_COLORS.gray};border-radius:99px;padding:3px 10px;font-size:10px;font-weight:700;margin:2px">😴 Descanso</span>`;
+
+    // Meals sorted by time — FIX: use tipo directly, only strip the " / ..." suffix
+    const meals = mealsEl
+      ? [...mealsEl.querySelectorAll('.dia-meal-row')].map(r => ({
+          tipo: r.querySelector('select')?.value || '',
+          hora: r.querySelector('input[type="time"]')?.value || '',
+        })).filter(m => m.hora).sort((a,b) => a.hora.localeCompare(b.hora))
+      : [];
+
+    const mealsHTML = meals.length
+      ? meals.map(m => {
+          // Only strip the " / Media mañana" clarification — keep the emoji and main name
+          const label = m.tipo.replace(/\s*\/\s*.*$/, '').trim().substring(0, 26);
+          return `<span style="display:inline-flex;align-items:center;gap:5px;background:${PDF_COLORS.sagePal};border:1px solid #c8ddd0;border-radius:7px;padding:3px 9px;font-size:11px;margin:2px;color:${PDF_COLORS.ink}">
+            <strong style="color:${PDF_COLORS.sage};font-size:11px">${m.hora}</strong>
+            <span style="color:#444">${label}</span>
+          </span>`;
+        }).join('')
+      : `<span style="font-size:11px;color:#aaa;font-style:italic">Sin ingestas registradas — rellenar en el formulario</span>`;
+
+    rows += `<div style="display:grid;grid-template-columns:48px 1fr;gap:12px;border-bottom:${isLast?'none':'1px solid #ebebeb'};padding:12px 0;page-break-inside:avoid">
+      <div style="width:42px;height:42px;border-radius:10px;background:${badgeC};color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${abrev}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${PDF_COLORS.ink};margin-bottom:6px">${dia}</div>
+        <div style="margin-bottom:7px;line-height:2;display:flex;flex-wrap:wrap">${tagsHTML}</div>
+        <div style="border-top:1px dashed ${PDF_COLORS.border};padding-top:7px;line-height:2;display:flex;flex-wrap:wrap">${mealsHTML}</div>
+      </div>
+    </div>`;
+  });
+
+  return `<div style="border:1.5px solid ${PDF_COLORS.border};border-left:4px solid ${PDF_COLORS.sage};border-radius:10px;padding:16px 20px;margin-bottom:16px;background:#fff">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:${PDF_COLORS.sage};margin-bottom:14px">🗓️ Planificación Semanal — Actividades e Ingestas por Día</div>
+    ${rows}
+  </div>`;
+}
+
+// ── IMPROVED GANTT ────────────────────────────
+function buildImprovedGantt() {
+  const nombre   = getVal('nombre');
+  const W        = 740;
+  const LABEL_W  = 82;
+  const CHART_W  = W - LABEL_W - 10;
+  const H_ROW    = 64;
+  const BAR_H    = 16;
+  const HEADER_H = 52;
+  const TOTAL_H  = DIAS_SEMANA.length * H_ROW + HEADER_H + 48;
+
+  const START_H = 6, END_H = 25; // 06:00 – 01:00 next day
+  const SPAN = END_H - START_H;
+
+  const timeToX = t => {
+    if (!t) return null;
+    const [h, m] = t.split(':').map(Number);
+    const decimal = h + m / 60;
+    const clamped = Math.max(START_H, Math.min(END_H, decimal));
+    return LABEL_W + ((clamped - START_H) / SPAN) * CHART_W;
+  };
+
+  const xToW = (ini, fin) => {
+    const x1 = timeToX(ini), x2 = timeToX(fin);
+    if (!x1 || !x2) return { x: 0, w: 0 };
+    return { x: x1, w: Math.max(x2 - x1, 4) };
+  };
+
+  // Grid lines
+  let grid = '';
+  for (let h = START_H; h <= END_H; h++) {
+    const x = LABEL_W + ((h - START_H) / SPAN) * CHART_W;
+    const label = h < 24 ? `${String(h).padStart(2,'0')}h` : `${String(h-24).padStart(2,'0')}h`;
+    grid += `<line x1="${x.toFixed(1)}" y1="${HEADER_H - 10}" x2="${x.toFixed(1)}" y2="${TOTAL_H - 30}" stroke="#e8ede9" stroke-width="${h%6===0?'1.5':'0.8'}"/>`;
+    grid += `<text x="${x.toFixed(1)}" y="${HEADER_H - 14}" text-anchor="middle" font-size="9" fill="${h%6===0?PDF_COLORS.gray:'#b0b8b2'}" font-weight="${h%6===0?'600':'400'}">${label}</text>`;
+  }
+
+  // Axis line
+  grid += `<line x1="${LABEL_W}" y1="${HEADER_H - 10}" x2="${W - 10}" y2="${HEADER_H - 10}" stroke="${PDF_COLORS.sage}" stroke-width="1.5"/>`;
+
+  // Day rows
+  let dayRows = '';
+  DIAS_SEMANA.forEach((dia, ri) => {
+    const Y = HEADER_H + ri * H_ROW;
+    const midY = Y + H_ROW / 2;
+    const ABREV = { 'Lunes':'L','Martes':'M','Miércoles':'X','Jueves':'J','Viernes':'V','Sábado':'S','Domingo':'D' };
+
+    // Alternating row bg
+    if (ri % 2 === 0) {
+      dayRows += `<rect x="0" y="${Y}" width="${W}" height="${H_ROW}" fill="#fafbfa"/>`;
+    }
+
+    // Day label
+    const abrev = ABREV[dia] || dia[0];
+    dayRows += `<rect x="4" y="${Y + H_ROW/2 - 13}" width="28" height="26" rx="6" fill="${PDF_COLORS.sage}"/>`;
+    dayRows += `<text x="18" y="${Y + H_ROW/2 + 5}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${abrev}</text>`;
+    dayRows += `<text x="${LABEL_W - 6}" y="${midY + 4}" text-anchor="end" font-size="10" fill="${PDF_COLORS.gray}">${dia.substring(0,3)}</text>`;
+
+    // Read tags from week builder
+    const refEl = document.getElementById('dia-ref-' + dia);
+    const tags  = refEl ? [...refEl.querySelectorAll('.dia-tag')] : [];
+
+    let barY = Y + 8;
+    tags.forEach(tag => {
+      const text = tag.textContent.trim();
+      const bg   = tag.style.background || PDF_COLORS.sage;
+      // Extract time from "... 08:00–15:00" or "... 08:00-15:00"
+      const m = text.match(/(\d{2}:\d{2})[–\-→](\d{2}:\d{2})/);
+      if (m) {
+        const { x, w } = xToW(m[1], m[2]);
+        if (w > 0) {
+          dayRows += `<rect x="${x.toFixed(1)}" y="${barY}" width="${w.toFixed(1)}" height="${BAR_H}" rx="4" fill="${bg}" opacity="0.88"/>`;
+          if (w > 28) {
+            const label = text.replace(m[0],'').replace(/^[^\w]+/,'').trim().substring(0, Math.floor(w/5.5));
+            dayRows += `<text x="${(x + w/2).toFixed(1)}" y="${barY + BAR_H/2 + 4}" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">${label}</text>`;
+          }
+          barY += BAR_H + 3;
+        }
+      }
+    });
+
+    // Meal circles from week builder
+    const mealsEl = document.getElementById('dia-meals-' + dia);
+    const meals = mealsEl
+      ? [...mealsEl.querySelectorAll('.dia-meal-row')].map(r => ({
+          tipo: r.querySelector('select')?.value || '',
+          hora: r.querySelector('input[type="time"]')?.value || '',
+        })).filter(m => m.hora)
+      : [];
+
+    const MEAL_COLORS = {
+      'Desayuno':'#2c5fa8','Almuerzo':'#5a82c8','Comida':'#1a4a80',
+      'Merienda':'#8b5fa8','Pre':'#3d6b4f','Post':'#5a8a6a',
+      'Cena':'#4a2c6b','Snack':'#7b5fa8',
+    };
+    const getMealColor = tipo => {
+      for (const [k,v] of Object.entries(MEAL_COLORS)) if (tipo.includes(k)) return v;
+      return '#6b7b70';
+    };
+
+    meals.forEach(meal => {
+      const cx = timeToX(meal.hora);
+      if (!cx) return;
+      const mc = getMealColor(meal.tipo);
+      dayRows += `<circle cx="${cx.toFixed(1)}" cy="${Y + H_ROW - 14}" r="6" fill="${mc}" stroke="#fff" stroke-width="2"/>`;
+      dayRows += `<text x="${cx.toFixed(1)}" y="${Y + H_ROW - 22}" text-anchor="middle" font-size="8" fill="${mc}" font-weight="600">${meal.hora}</text>`;
+    });
+
+    // Row separator
+    dayRows += `<line x1="${LABEL_W}" y1="${Y + H_ROW}" x2="${W - 5}" y2="${Y + H_ROW}" stroke="#e8ede9" stroke-width="0.6"/>`;
+  });
+
+  // Legend
+  const legendY = TOTAL_H - 26;
+  const legendItems = [
+    { color: PDF_COLORS.amber, label: 'Trabajo' },
+    { color: PDF_COLORS.sage,  label: 'Entrenamiento' },
+    { color: PDF_COLORS.red,   label: 'Competición' },
+    { color: '#5a82c8',        label: 'Clases / Estudio' },
+    { color: '#2c5fa8',        label: 'Ingesta (círculo)' },
+  ];
+  let legend = `<text x="${LABEL_W}" y="${legendY - 8}" font-size="8" fill="${PDF_COLORS.gray}" font-weight="700" letter-spacing="1.5" text-transform="uppercase">LEYENDA</text>`;
+  legendItems.forEach((l, i) => {
+    const lx = LABEL_W + i * 118;
+    legend += `<rect x="${lx}" y="${legendY}" width="10" height="10" rx="2" fill="${l.color}"/>`;
+    legend += `<text x="${lx + 14}" y="${legendY + 9}" font-size="9" fill="${PDF_COLORS.gray}">${l.label}</text>`;
+  });
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${TOTAL_H}" style="font-family:Arial,sans-serif;display:block;max-width:100%">
+    <rect width="${W}" height="${TOTAL_H}" fill="#fff" rx="8"/>
+    ${grid}
+    ${dayRows}
+    ${legend}
+  </svg>`;
+
+  return `<div style="border:1.5px solid ${PDF_COLORS.border};border-radius:10px;padding:16px;margin-bottom:0;background:#fff;overflow:hidden;page-break-inside:avoid">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:${PDF_COLORS.sage};margin-bottom:12px">📊 Diagrama de Planificación Semanal</div>
+    ${svg}
+  </div>`;
+}
+
+// ── FULL VISUAL PDF BUILDER ───────────────────
+function buildVisualPDF() {
+  const v = getVal, r = getRadio, c = getChecked;
+  const nombre = v('nombre');
+  const fecha  = new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'long', year:'numeric' });
+
+  const secHeader = (icon, title, color) => `
+    <div style="background:${color||PDF_COLORS.sage};padding:9px 18px;border-radius:8px 8px 0 0;margin-top:18px;margin-bottom:0">
+      <span style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#fff">${icon} ${title}</span>
+    </div>
+    <div style="border:1.5px solid ${color||PDF_COLORS.sage};border-top:none;border-radius:0 0 8px 8px;padding:14px 18px;margin-bottom:4px;background:#fff;page-break-inside:avoid">`;
+  const secClose = () => `</div>`;
+
+  // ── DATOS PERSONALES ──
+  const datosContent = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      ${[
+        ['Sexo',   r('sexo')],
+        ['Edad',   v('edad') + ' años'],
+        ['Talla',  v('talla') + ' cm'],
+        ['Peso',   v('peso') + ' kg'],
+        ['Obj.',   v('peso_objetivo') + ' kg'],
+        ['Email',  v('email')],
+        ['Tel.',   v('telefono')],
+      ].filter(([,val]) => val && val !== '—' && val !== ' años' && val !== ' cm' && val !== ' kg' && val !== '— kg')
+       .map(([k,val]) => `<div style="background:${PDF_COLORS.sagePal};border-radius:8px;padding:8px 12px">
+          <div style="font-size:9px;font-weight:700;color:${PDF_COLORS.sage};text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">${k}</div>
+          <div style="font-size:13px;font-weight:700;color:${PDF_COLORS.ink}">${val}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // ── SALUD ──
+  const saludRows = [
+    ['Enfermedades',    r('enfermedad_yn') === 'Sí' ? v('enfermedades') : 'No'],
+    ['Medicamentos',    r('medicamento_yn') === 'Sí' ? v('medicamentos') : 'No'],
+    ['Análisis recientes', r('analisis_yn') === 'Sí' ? (v('analisis_resultado') || 'Sí, sin alteraciones') : 'No'],
+    ['Historial dietético', r('dieta_previa_yn') === 'Sí' ? v('dietas_previas') : 'No'],
+  ].filter(([,val]) => val && val !== '—').map(([k,val]) => pRow(k, val)).join('');
+
+  // ── RUTINA — horario ──
+  const situacion = r('situacion_laboral');
+  const horTipo   = r('horario_tipo');
+  let horarioDesc = '';
+  if (horTipo === 'Horario fijo') {
+    horarioDesc = `${c('ht-fijo-dias')} · ${v('trabajo_inicio')}–${v('trabajo_fin')}`;
+  } else if (horTipo === 'Horario partido') {
+    horarioDesc = `Mañana ${v('partido_man_ini')}–${v('partido_man_fin')} / Tarde ${v('partido_tar_ini')}–${v('partido_tar_fin')}`;
+  } else if (horTipo === 'Turnos rotativos') {
+    horarioDesc = v('turnos_patron');
+  } else if (horTipo === 'Autónomo / variable') {
+    horarioDesc = v('auto_descripcion');
+  }
+
+  // ── RUTINA — ingestas en el trabajo ──
+  const MEAL_KEYS = [
+    {id:'desayuno', label:'Desayuno'},
+    {id:'almuerzo', label:'Almuerzo'},
+    {id:'comida',   label:'Comida'},
+    {id:'merienda', label:'Merienda'},
+    {id:'cena',     label:'Cena'},
+  ];
+  const trabMealsHTML = (() => {
+    if (r('come_trabajo_yn') !== 'Sí') return 'No come en el trabajo';
+    const items = MEAL_KEYS.filter(m => document.getElementById('tc-' + m.id)?.checked)
+      .map(m => {
+        const modo = document.querySelector(`input[name="ctm-${m.id}"]:checked`)?.value || '';
+        const detId = `trabajo_${m.id}_${modo === 'Tupper' ? 'tupper' : 'rest'}`;
+        const det   = v(detId);
+        return `<div style="border-left:3px solid ${PDF_COLORS.amber};padding:5px 10px;margin-bottom:5px;background:${PDF_COLORS.amberPal};border-radius:0 6px 6px 0">
+          <div style="font-size:10px;font-weight:700;color:${PDF_COLORS.amber}">${m.label} · ${modo}</div>
+          ${det && det !== '—' ? `<div style="font-size:11px;color:${PDF_COLORS.ink};margin-top:2px">${det}</div>` : ''}
+        </div>`;
+      });
+    return items.length ? items.join('') : 'Sí (sin detallar)';
+  })();
+
+  // ── RUTINA — actividades ──
+  const actividadesTags = (() => {
+    const acts = [];
+    document.querySelectorAll('.activity-block').forEach(b => {
+      const tipo = b.querySelector('.act-tipo-val')?.value || b.querySelector('.sport-search-input')?.value || '';
+      const mod  = b.querySelector('input[name^="act-modalidad"]:checked')?.value || '';
+      const ini  = b.querySelector('.act-inicio')?.value || '';
+      const fin  = b.querySelector('.act-fin')?.value    || '';
+      const dias = [...b.querySelectorAll('.days-check input:checked')].map(x => x.value);
+      if (!tipo) return;
+      const isComp = mod === 'Competición';
+      const color  = isComp ? PDF_COLORS.red : PDF_COLORS.sage;
+      const horario = ini && fin ? ` ${ini}–${fin}` : '';
+      const diasStr = dias.length ? ` (${dias.map(d=>d.substring(0,3)).join(', ')})` : '';
+      acts.push(`<span style="display:inline-block;background:${color};color:#fff;border-radius:99px;padding:4px 11px;font-size:11px;font-weight:700;margin:3px;white-space:nowrap">${isComp?'🏆':'🏋️'} ${tipo}${horario}${diasStr}</span>`);
+    });
+    return acts.join('') || '<span style="color:#aaa;font-size:12px">No registradas</span>';
+  })();
+
+  const neatVal = [r('pasos'), c('desplazamiento'), v('neat_obs')].filter(x => x && x !== '—').join(' · ');
+
+  // ── ALERGIAS ──
+  const alergias = c('alergia');
+  const alergiaChips = alergias && alergias !== '—'
+    ? alergias.split(', ').map(a => pChip(a, a === 'Ninguna' ? PDF_COLORS.sagePal : '#fdf0f0', a === 'Ninguna' ? PDF_COLORS.sage : PDF_COLORS.red)).join('')
+    : pChip('Ninguna conocida', PDF_COLORS.sagePal, PDF_COLORS.sage);
+
+  // ── COMIDAS HABITUALES ──
+  const comidasHab = [
+    ['🌅 Desayuno',      'desayuno_hab'],
+    ['☕ Media mañana',  'almuerzo_hab'],
+    ['🍽️ Comida',       'comida_hab'],
+    ['🍌 Merienda',     'merienda_hab'],
+    ['💪 Pre-entreno',  'pre_entreno'],
+    ['🥤 Post-entreno', 'post_entreno'],
+    ['🌙 Cena',         'cena_hab'],
+    ['🍫 Picoteo noche','picoteo_noche'],
+  ].filter(([,id]) => v(id) && v(id) !== '—')
+   .map(([label, id]) => `
+    <div style="border-left:3px solid ${PDF_COLORS.sage};padding:6px 10px;margin-bottom:6px;background:${PDF_COLORS.sagePal};border-radius:0 6px 6px 0;page-break-inside:avoid">
+      <div style="font-size:10px;font-weight:700;color:${PDF_COLORS.sage};margin-bottom:2px">${label}</div>
+      <div style="font-size:12px;color:${PDF_COLORS.ink}">${v(id)}</div>
+    </div>`).join('');
+
+  // ── OBJETIVOS ──
+  const objChips = c('objetivo').split(', ').filter(Boolean)
+    .map(o => pChip(o, PDF_COLORS.sagePal, PDF_COLORS.sage)).join('');
+
+  // ── COMER FUERA ──
+  const fueraRows = [
+    ['Frecuencia',         r('come_fuera_frec')],
+    ['Cuándo',             c('come_fuera_cuando')],
+    ['Restaurantes',       v('restaurantes_habituales')],
+    ['Desayunos fuera',    v('fuera_desayuno')],
+    ['Comidas fuera',      v('fuera_comida')],
+    ['Cenas fuera',        v('fuera_cena')],
+    ['Qué suele pedir',    v('fuera_que_comes')],
+    ['Info extra',         v('fuera_extra')],
+  ].filter(([,val]) => val && val !== '—').map(([k,val]) => pRow(k,val)).join('');
+
+  // ── COMIDAS FUERA DE DIETA ──
+  const offDietRows = [
+    ['Comidas fuera de dieta',     v('comidas_fuera_dieta')],
+    ['Sentimiento al respecto',    r('sentimiento_extras')],
+  ].filter(([,val]) => val && val !== '—').map(([k,val]) => pRow(k,val)).join('');
+
+  // ── MOTIVACIÓN Y ADHERENCIA ──
+  const motivRows = [
+    ['Dificultades',         c('dificultad')],
+    ['No renuncia a',        v('no_renuncio')],
+    ['Apps que usa',         c('apps')],
+    ['Comentarios libres',   v('comentarios_libres')],
+    ['Info extra trabajo',   v('trabajo_extra')],
+  ].filter(([,val]) => val && val !== '—').map(([k,val]) => pRow(k,val)).join('');
+
+  // ── SUEÑO E HIDRATACIÓN ──
+  const suenoRows = [
+    ['Levantarse',     v('hora_levantarse')],
+    ['Acostarse',      v('hora_acostarse')],
+    ['Calidad sueño',  r('calidad_sueño')],
+    ['Notas sueño',    v('sueno_obs')],
+    ['Agua al día',    v('agua')],
+    ['Bebidas',        c('bebidas')],
+    ['Notas hidrat.',  v('hidratacion_obs')],
+  ].filter(([,val]) => val && val !== '—').map(([k,val]) => pRow(k,val)).join('');
+
+  // ────────────────────────────────────────────
+  return `<div style="font-family:Arial,Helvetica,sans-serif;color:#1e2820;background:#fff;padding:0;max-width:780px;margin:0 auto">
+
+    <!-- HEADER -->
+    <div style="background:${PDF_COLORS.sage};padding:26px 32px;border-radius:0 0 14px 14px;margin-bottom:16px">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px">Cuestionario Inicial · Plan Nutricional Personalizado</div>
+      <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:3px">${nombre}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7)">${fecha}</div>
+    </div>
+
+    <!-- DATOS PERSONALES -->
+    ${secHeader('👤', 'Datos Personales')}
+      ${datosContent}
+    ${secClose()}
+
+    <!-- ESTADO DE SALUD -->
+    ${secHeader('🩺', 'Estado de Salud', PDF_COLORS.blue)}
+      ${saludRows || pRow('Estado general','Sin condiciones médicas relevantes')}
+    ${secClose()}
+
+    <!-- RUTINA -->
+    ${secHeader('⚙️', 'Rutina y Actividad')}
+      ${pRow('Situación laboral', situacion)}
+      ${pRow('Tipo de jornada', horTipo)}
+      ${pRow('Horario / Descripción', horarioDesc)}
+      <div style="margin-top:8px">
+        <div style="font-size:10px;font-weight:700;color:${PDF_COLORS.amber};letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Ingestas en el trabajo</div>
+        <div>${typeof trabMealsHTML === 'string' && trabMealsHTML.startsWith('<') ? trabMealsHTML : pRow('', trabMealsHTML)}</div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:10px;font-weight:700;color:${PDF_COLORS.gray};letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">Actividades deportivas</div>
+        <div style="display:flex;flex-wrap:wrap;line-height:1.8">${actividadesTags}</div>
+      </div>
+      ${neatVal ? pRow('Actividad no estructurada (NEAT)', neatVal) : ''}
+    ${secClose()}
+
+    <!-- PLANIFICACIÓN SEMANAL — la pieza central -->
+    <div style="margin-top:18px">
+      ${buildWeeklyScheduleHTML()}
+    </div>
+
+    <!-- PREFERENCIAS ALIMENTARIAS -->
+    ${secHeader('🥗', 'Preferencias Alimentarias')}
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:${PDF_COLORS.gray};letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">Alergias / Intolerancias</div>
+        <div>${alergiaChips}</div>
+      </div>
+      ${pRow('Tipo de alimentación', r('tipo_alimentacion'))}
+      ${pRow('Le gusta', v('alimentos_gustan'))}
+      ${pRow('Disponible en casa', v('alimentos_disponibles'))}
+      ${pRow('No le gusta', v('alimentos_no_gustan'))}
+    ${secClose()}
+
+    <!-- COMIDAS HABITUALES -->
+    ${secHeader('🍽️', 'Comidas Habituales', PDF_COLORS.amber)}
+      ${comidasHab || '<p style="color:#aaa;font-size:12px">No registradas</p>'}
+      ${v('comidas_info_extra') && v('comidas_info_extra') !== '—' ? pRow('Info extra (métodos, situaciones…)', v('comidas_info_extra')) : ''}
+    ${secClose()}
+
+    <!-- HÁBITOS FUERA DE CASA -->
+    ${fueraRows || offDietRows ? `
+    ${secHeader('🍴', 'Hábitos fuera de casa')}
+      ${fueraRows}
+      ${offDietRows}
+    ${secClose()}` : ''}
+
+    <!-- OBJETIVOS Y MOTIVACIÓN -->
+    ${secHeader('🎯', 'Objetivos')}
+      <div style="margin-bottom:8px">${objChips}</div>
+      ${pRow('Objetivos secundarios', v('obj_sec_otro'))}
+      ${pRow('Plazo', r('plazo'))}
+      ${motivRows}
+    ${secClose()}
+
+    <!-- SUEÑO E HIDRATACIÓN -->
+    ${secHeader('💧', 'Sueño e Hidratación', '#2c7a9f')}
+      ${suenoRows}
+    ${secClose()}
+
+    <!-- GANTT: siempre en página nueva -->
+    <div style="page-break-before:always;margin-top:0">
+      ${buildImprovedGantt()}
+    </div>
+
+    <!-- FOOTER -->
+    <div style="border-top:1px solid ${PDF_COLORS.border};margin-top:20px;padding-top:10px;text-align:center;font-size:9px;color:#aaa">
+      Cuestionario Inicial · ${nombre} · ${fecha}
+    </div>
+  </div>`;
+}
+
+// ── SUBMIT FORM (on-screen summary) ──────────
+function submitForm() {
+  // On screen: keep clean structured summary
+  const summaryData = [
+    { section: '1. Datos Personales', rows: [
+      ['Nombre', getVal('nombre')], ['Fecha', getVal('fecha_nac')], ['Edad', getVal('edad') + ' años'],
+      ['Talla', getVal('talla') + ' cm'], ['Peso', getVal('peso') + ' kg'], ['Peso objetivo', getVal('peso_objetivo') + ' kg'],
+      ['Sexo', getRadio('sexo')], ['Email', getVal('email')], ['Teléfono', getVal('telefono')],
+    ]},
+    { section: '2. Estado de Salud', rows: [
+      ['Enfermedades', getRadio('enfermedad_yn') === 'Sí' ? getVal('enfermedades') : 'No'],
+      ['Medicamentos', getRadio('medicamento_yn') === 'Sí' ? getVal('medicamentos') : 'No'],
+      ['Análisis recientes', getRadio('analisis_yn')],
+      ['Parámetros', getVal('analisis_resultado')],
+      ['Dieta previa', getRadio('dieta_previa_yn') === 'Sí' ? getVal('dietas_previas') : 'No'],
+    ]},
+    { section: '3. Rutina', rows: [
+      ['Situación', getRadio('situacion_laboral')],
+      ['Tipo jornada', getRadio('horario_tipo')],
+      ['Actividades', getActivitiesSummary()],
+      ['NEAT', getVal('neat_obs')],
+    ]},
+    { section: '4. Semana tipo', rows: [
+      ['Planificación semanal', getDiasTipoSummary()],
+    ]},
+    { section: '5. Alimentación', rows: [
+      ['Alergias', getChecked('alergia')],
+      ['Tipo alimentación', getRadio('tipo_alimentacion')],
+      ['Le gusta', getVal('alimentos_gustan')],
+      ['No le gusta', getVal('alimentos_no_gustan')],
+    ]},
+    { section: '6. Comidas habituales', rows: [
+      ['Desayuno', getVal('desayuno_hab')], ['Media mañana', getVal('almuerzo_hab')],
+      ['Comida', getVal('comida_hab')], ['Merienda', getVal('merienda_hab')],
+      ['Pre-entreno', getVal('pre_entreno')], ['Post-entreno', getVal('post_entreno')],
+      ['Cena', getVal('cena_hab')],
+    ]},
+    { section: '7. Objetivos', rows: [
+      ['Objetivo principal', getChecked('objetivo')],
+      ['Secundarios', getVal('obj_sec_otro')],
+      ['Plazo', getRadio('plazo')],
+    ]},
+    { section: '8. Sueño e Hidratación', rows: [
+      ['Levantarse', getVal('hora_levantarse')], ['Acostarse', getVal('hora_acostarse')],
+      ['Calidad sueño', getRadio('calidad_sueño')], ['Agua', getVal('agua')],
+    ]},
+  ];
+
+  let html = '';
+  summaryData.forEach(sec => {
+    html += `<div class="summary-card"><div class="summary-section-title">${sec.section}</div>`;
+    sec.rows.forEach(([k, v]) => {
+      if (!v || v === '—' || v === '' || v === 'undefined') return;
+      html += `<div class="summary-row"><div class="summary-key">${k}</div><div class="summary-val">${v}</div></div>`;
+    });
+    html += '</div>';
+  });
+
+  document.getElementById('summary-content').innerHTML = html;
+  document.querySelector('.progress-wrap').style.display = 'none';
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  document.getElementById('summary-view').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── GENERAR PDF VISUAL ────────────────────────
+async function generarYEnviar() {
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Generando PDF…';
+
+  const nombre = document.getElementById('nombre')?.value?.trim() || 'Paciente';
+
+  // ── Build a full-screen overlay containing the PDF content.
+  // html2canvas ONLY works reliably on elements that are actually
+  // painted on screen. We cover the page with a white overlay so
+  // the user doesn't see the underlying form, and place the PDF
+  // content div inside it where it IS rendered by the browser.
+  const overlay = document.createElement('div');
+  overlay.style.cssText = [
+    'position:fixed', 'top:0', 'left:0', 'right:0', 'bottom:0',
+    'background:#fff', 'z-index:999998', 'overflow-y:scroll',
+  ].join(';');
+
+  // Loading badge on top of the overlay
+  const badge = document.createElement('div');
+  badge.style.cssText = [
+    'position:fixed', 'top:50%', 'left:50%',
+    'transform:translate(-50%,-50%)',
+    'background:#3d6b4f', 'color:#fff',
+    'padding:20px 36px', 'border-radius:14px',
+    'font-family:Arial,sans-serif', 'font-size:16px', 'font-weight:700',
+    'z-index:999999', 'box-shadow:0 8px 32px rgba(0,0,0,.25)',
+    'text-align:center', 'line-height:1.6',
+  ].join(';');
+  badge.innerHTML = '⏳ Generando tu PDF...<br><span style="font-size:12px;opacity:.8">Esto tardará unos segundos</span>';
+
+  // The actual content div that html2canvas will capture
+  const pdfDiv = document.createElement('div');
+  pdfDiv.style.cssText = 'width:794px;margin:0 auto;background:#fff;padding:0';
+  pdfDiv.innerHTML = buildVisualPDF();
+
+  overlay.appendChild(pdfDiv);
+  document.body.appendChild(overlay);
+  document.body.appendChild(badge);
+
+  // Two rAF cycles + 600 ms to guarantee the browser has fully painted
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  await new Promise(r => setTimeout(r, 600));
+
+  const opt = {
+    margin:      [8, 8, 8, 8],
+    filename:    'Cuestionario_Nutricional_' + nombre.replace(/\s+/g, '_') + '.pdf',
+    image:       { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false,
+                   scrollX: 0, scrollY: -overlay.scrollTop },
+    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:   { mode: ['css', 'legacy'] },
+  };
+
+  try {
+    await html2pdf().set(opt).from(pdfDiv).save();
+    // Auto-export datos JSON para el nutricionista (se descarga silenciosamente)
+    exportarDatosJSON(nombre);
+  } catch(e) {
+    console.error('html2pdf error:', e);
+    alert('Error al generar el PDF: ' + e.message);
+  } finally {
+    // Always clean up and re-enable
+    if (overlay.parentNode) document.body.removeChild(overlay);
+    if (badge.parentNode)   document.body.removeChild(badge);
+    btn.disabled = false;
+    btn.innerHTML = '📄 Generar PDF de nuevo';
+    const envioWrap = document.querySelector('.envio-wrap');
+    envioWrap.style.display = 'block';
+    document.getElementById('envio-panel').classList.add('visible');
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORTAR DATOS JSON PARA EL NUTRICIONISTA (uso interno)
+// ══════════════════════════════════════════════════════════════
+function exportarDatosJSON(nombre) {
+  try {
+    const v   = id => (document.getElementById(id)?.value || '').trim() || null;
+    const rad = name => document.querySelector(`input[name="${name}"]:checked`)?.value || null;
+    const chk = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value);
+    const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+    // Semana: actividades y comidas por día
+    const semana = {};
+    DIAS.forEach(dia => {
+      const mealsEl = document.getElementById('dia-meals-' + dia);
+      const comidas = mealsEl
+        ? [...mealsEl.querySelectorAll('.dia-meal-row')].map(rw => ({
+            tipo: rw.querySelector('select')?.value || '',
+            hora: rw.querySelector('input[type="time"]')?.value || ''
+          })).filter(m => m.tipo)
+        : [];
+      const refEl = document.getElementById('dia-ref-' + dia);
+      const actTags = refEl
+        ? [...refEl.querySelectorAll('.dia-tag')].map(t => t.textContent.trim())
+        : [];
+      semana[dia] = { actividadesTexto: actTags, comidas };
+    });
+
+    // Actividades estructuradas
+    const actividades = [];
+    document.querySelectorAll('.activity-block').forEach(b => {
+      const tipo = b.querySelector('.act-tipo-val')?.value || b.querySelector('.sport-search-input')?.value || '';
+      const mod  = b.querySelector('input[name^="act-modalidad"]:checked')?.value || '';
+      const ini  = b.querySelector('.act-inicio')?.value || '';
+      const fin  = b.querySelector('.act-fin')?.value || '';
+      const dias = [...b.querySelectorAll('.days-check input:checked')].map(x => x.value);
+      if (tipo) actividades.push({ tipo, modalidad: mod, inicio: ini, fin, dias });
+    });
+
+    const data = {
+      _version:    '2.0',
+      _exportDate: new Date().toISOString().split('T')[0],
+      paciente: {
+        nombre:       v('nombre'),
+        fechaNac:     v('fecha_nac'),
+        edad:         parseInt(v('edad')) || null,
+        sexo:         rad('sexo'),
+        talla:        parseFloat(v('talla')) || null,
+        peso:         parseFloat(v('peso')) || null,
+        pesoObjetivo: parseFloat(v('peso_objetivo')) || null,
+        email:        v('email'),
+        telefono:     v('telefono')
+      },
+      salud: {
+        enfermedades:      rad('enfermedad_yn') === 'Sí' ? v('enfermedades') : null,
+        medicamentos:      rad('medicamento_yn') === 'Sí' ? v('medicamentos') : null,
+        analisis:          rad('analisis_yn'),
+        analisisResultado: v('analisis_resultado'),
+        dietaPrevia:       rad('dieta_previa_yn') === 'Sí' ? v('dietas_previas') : null
+      },
+      rutina: {
+        situacionLaboral:   rad('situacion_laboral'),
+        horarioTipo:        rad('horario_tipo'),
+        trabajoInicio:      v('trabajo_inicio'),
+        trabajoFin:         v('trabajo_fin'),
+        partidoManIni:      v('partido_man_ini'),
+        partidoManFin:      v('partido_man_fin'),
+        partidoTarIni:      v('partido_tar_ini'),
+        partidoTarFin:      v('partido_tar_fin'),
+        turnosPatron:       v('turnos_patron'),
+        turManIni:          v('tur-man-ini'),
+        turManFin:          v('tur-man-fin'),
+        turTarIni:          v('tur-tar-ini'),
+        turTarFin:          v('tur-tar-fin'),
+        turNocIni:          v('tur-noc-ini'),
+        turNocFin:          v('tur-noc-fin'),
+        autoDescripcion:    v('auto_descripcion'),
+        tipoTrabajo:        (() => { const s=document.getElementById('tipo_trabajo'); return s?s.value:null; })(),
+        diasTrabajo:        [...document.querySelectorAll('#ht-fijo-dias input:checked, #ht-partido-dias input:checked')].map(x=>x.value),
+        estudioModalidad:   rad('estudio_modalidad'),
+        tipoEstudio:        (() => { const s=document.getElementById('tipo_estudio'); return s?s.value:null; })(),
+        claseInicio:        v('clase_inicio'),
+        claseFin:           v('clase_fin'),
+        neatPasos:          rad('pasos'),
+        neatDesplazamiento: chk('desplazamiento').join(', ')
+      },
+      actividades,
+      semana,
+      alimentacion: {
+        alergias:          chk('alergia').join(', ') || 'Ninguna',
+        tipoAlimentacion:  rad('tipo_alimentacion'),
+        gustos:            v('alimentos_gustan'),
+        noGusta:           v('alimentos_no_gustan'),
+        disponible:        v('alimentos_disponibles')
+      },
+      comidasHabituales: {
+        desayuno:     v('desayuno_hab'),
+        mediaMañana:  v('almuerzo_hab'),
+        comida:       v('comida_hab'),
+        merienda:     v('merienda_hab'),
+        preEntreno:   v('pre_entreno'),
+        postEntreno:  v('post_entreno'),
+        cena:         v('cena_hab'),
+        picoteoNoche: v('picoteo_noche'),
+        extra:        v('comidas_info_extra')
+      },
+      objetivos: {
+        principal:  chk('objetivo').join(', '),
+        secundario: v('obj_sec_otro'),
+        plazo:      rad('plazo')
+      },
+      habitos: {
+        horaLevantarse: v('hora_levantarse'),
+        horaAcostarse:  v('hora_acostarse'),
+        calidadSueño:   rad('calidad_sueño'),
+        suenoObs:       v('sueno_obs'),
+        agua:           v('agua'),
+        bebidas:        chk('bebidas').join(', ')
+      },
+      adherencia: {
+        dificultades: chk('dificultad').join(', '),
+        noRenuncia:   v('no_renuncio'),
+        comentarios:  v('comentarios_libres')
+      },
+      fueraDeCasa: {
+        frecuencia:    rad('come_fuera_frec'),
+        cuando:        chk('come_fuera_cuando').join(', '),
+        restaurantes:  v('restaurantes_habituales'),
+        quePide:       v('fuera_que_comes')
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'datos_paciente_' + (nombre || 'paciente').replace(/\s+/g,'_') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    console.warn('JSON export error:', e);
+  }
+}
+
+
+function updateStudyOptions() {
+  const modalidad = document.querySelector('input[name="estudio_modalidad"]:checked')?.value || '';
+  const sel = document.getElementById('tipo_estudio');
+  const campo = document.getElementById('campo-tipo-estudio');
+  if (!sel) return;
+  if (campo) campo.style.display = modalidad ? 'block' : 'none';
+  const allOpts = {
+    'Presencial': [
+      {v:'Estudiante (presencial, sentado en clase)', l:'Universidad / FP / Ciclo presencial (sentado en clase)'},
+      {v:'Estudiante (presencial, laboratorio/taller)', l:'Presencial con laboratorio o taller (más activo)'},
+    ],
+    'Online': [
+      {v:'Estudiante (online / estudio en casa)', l:'Online / Campus virtual (estudio en casa)'},
+      {v:'Opositor (estudio intensivo, sentado)', l:'Opositor (estudio intensivo en casa)'},
+    ],
+    'Mixto': [
+      {v:'Estudiante (presencial, sentado en clase)', l:'Días presenciales (sentado en clase)'},
+      {v:'Estudiante (online / estudio en casa)', l:'Días online (estudio en casa)'},
+    ],
+  };
+  const opts = allOpts[modalidad] || [];
+  sel.innerHTML = '<option value="">Selecciona…</option>' +
+    opts.map(o => `<option value="${o.v}">${o.l}</option>`).join('');
+}
+
+
+function abrirCorreo() {
+  const nombre = document.getElementById('nombre')?.value?.trim() || 'Paciente';
+  const asunto = encodeURIComponent('Cuestionario Nutricional — ' + nombre);
+  const cuerpo = encodeURIComponent(
+    'Hola,\n\nTe envío mi cuestionario nutricional inicial completado en PDF.\n\nNombre: ' + nombre +
+    '\n\nQuedo a tu disposición para cualquier consulta.\n\nSaludos,\n' + nombre);
+  window.location.href = 'mailto:sergi_rm@hotmail.com?subject=' + asunto + '&body=' + cuerpo;
+}
+
+// ── STEP 6: SYNC MEAL CARDS WITH WEEK BUILDER ─
+const MEAL_CARD_MAP = [
+  { id: 'mc-desayuno', keys: ['Desayuno'] },
+  { id: 'mc-almuerzo', keys: ['Almuerzo', 'Media mañana'] },
+  { id: 'mc-comida',   keys: ['Comida'] },
+  { id: 'mc-merienda', keys: ['Merienda'] },
+  { id: 'mc-pre',      keys: ['Pre-entrenamiento', 'Pre-'] },
+  { id: 'mc-post',     keys: ['Post-entrenamiento', 'Post-'] },
+  { id: 'mc-cena',     keys: ['Cena', 'Snack'] },
+];
+const CARD_CONTAINERS = [
+  { id: 'card-desayuno-almuerzo', children: ['mc-desayuno', 'mc-almuerzo'] },
+  { id: 'card-comida',            children: ['mc-comida'] },
+  { id: 'card-merienda-entreno',  children: ['mc-merienda', 'mc-pre', 'mc-post'] },
+  { id: 'card-cena',              children: ['mc-cena'] },
+];
+
+function sincronizarComidasHabituales() {
+  // Collect ALL meal type values from the week builder
+  const tiposUsados = new Set();
+  DIAS_SEMANA.forEach(dia => {
+    const mealsEl = document.getElementById('dia-meals-' + dia);
+    if (!mealsEl) return;
+    [...mealsEl.querySelectorAll('.dia-meal-row select')].forEach(sel => {
+      if (sel.value) tiposUsados.add(sel.value);
+    });
+  });
+
+  const banner = document.getElementById('comidas-sync-banner');
+
+  // If step 4 hasn't been filled yet → show everything, no banner
+  if (tiposUsados.size === 0) {
+    MEAL_CARD_MAP.forEach(m => {
+      const el = document.getElementById(m.id);
+      if (el) el.style.display = '';
+    });
+    CARD_CONTAINERS.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (el) el.style.display = '';
+    });
+    if (banner) {
+      banner.style.display = 'block';
+      banner.innerHTML = '⚠️ <strong>No has añadido ingestas en tus días tipo aún</strong> (Paso 4). Se muestran todas las opciones. Vuelve al Paso 4, añade tus ingestas y este apartado se filtrará automáticamente.';
+    }
+    return;
+  }
+
+  // Determine which meal-cards to show
+  const visibleSet = new Set();
+  MEAL_CARD_MAP.forEach(m => {
+    const visible = m.keys.some(kw =>
+      [...tiposUsados].some(t => t.includes(kw))
+    );
+    const el = document.getElementById(m.id);
+    if (el) el.style.display = visible ? '' : 'none';
+    if (visible) visibleSet.add(m.id);
+  });
+
+  // Hide card containers where ALL children are hidden
+  CARD_CONTAINERS.forEach(c => {
+    const anyVisible = c.children.some(childId => visibleSet.has(childId));
+    const el = document.getElementById(c.id);
+    if (el) el.style.display = anyVisible ? '' : 'none';
+  });
+
+  // Banner feedback
+  if (banner) {
+    const shown  = visibleSet.size;
+    const hidden = MEAL_CARD_MAP.length - shown;
+    banner.style.display = 'block';
+    if (hidden > 0) {
+      const names = MEAL_CARD_MAP
+        .filter(m => !visibleSet.has(m.id))
+        .map(m => m.keys[0])
+        .join(', ');
+      banner.innerHTML = `✅ <strong>Filtrado desde tus días tipo:</strong> Solo se muestran las ${shown} ingestas que aparecen en tu semana. Se han ocultado: <em>${names}</em>. Si falta alguna, añádela en el Paso 4.`;
+    } else {
+      banner.innerHTML = `✅ <strong>Ingestas sincronizadas con tus días tipo.</strong> Describe lo que sueles comer en cada una.`;
+    }
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────
+function goStep(n) {
+  const prev = document.getElementById('step-' + currentStep);
+  prev.classList.remove('active');
+  prev.style.display = '';
+  currentStep = n;
+  const next = document.getElementById('step-' + currentStep);
+  next.style.display = '';
+  next.classList.add('active');
+  if (n === 4) construirSemana();
+  if (n === 6) sincronizarComidasHabituales();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = 'Paso ' + currentStep + ' de ' + totalSteps;
+  for (let i = 1; i <= totalSteps; i++) {
+    const el = document.getElementById('pl-' + i);
+    if (el) el.classList.toggle('active', i === currentStep);
+  }
+}
+
+// ── AGE CALCULATION ───────────────────────────
+document.getElementById('fecha_nac').addEventListener('change', function() {
+  const dob = new Date(this.value);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  document.getElementById('edad').value = age > 0 ? age : '';
+});
+
+// ── SHOW CYCLE FIELD FOR WOMEN ────────────────
+document.querySelectorAll('input[name="sexo"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('campo-ciclo').style.display =
+      document.querySelector('input[name="sexo"]:checked')?.value === 'Mujer' ? 'block' : 'none';
+  });
+});
+
+</script>
+<!-- PDF PRINT WRAPPER - populated by JS, shown only when printing -->
+<div id="pdf-print-wrapper" style="display:none"></div>
+
+</body>
+</html>
