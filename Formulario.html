@@ -2150,7 +2150,7 @@
     <div class="step-num">7</div>
     <div>
       <div class="step-title">Objetivos y Expectativas</div>
-      <div class="step-desc">¿Qué quieres conseguir y en qué plazo?</div>
+      <div class="step-desc">¿Qué quieres conseguir?</div>
     </div>
   </div>
 
@@ -2175,14 +2175,6 @@
           <span class="hint">Escribe libremente cualquier objetivo adicional que quieras trabajar</span>
         </label>
         <textarea id="obj_sec_otro" placeholder="Ej: Mejorar la digestión, tener más energía por las mañanas, reducir la inflamación, mejorar los niveles de analítica…" style="min-height:80px"></textarea>
-      </div>
-      <div class="field">
-        <label>¿En cuánto tiempo te gustaría ver resultados?</label>
-        <div class="pill-group">
-          <input type="radio" name="plazo" id="pl-6m" value="6 meses"><label for="pl-6m">6 meses</label>
-          <input type="radio" name="plazo" id="pl-1a" value="1 año o más"><label for="pl-1a">1 año o más</label>
-          <input type="radio" name="plazo" id="pl-sin" value="Sin prisa, cambio de hábitos sostenible"><label for="pl-sin">Sin prisa, cambio sostenible</label>
-        </div>
       </div>
     </div>
   </div>
@@ -3542,7 +3534,6 @@ function buildVisualPDF() {
     ${secHeader('🎯', 'Objetivos')}
       <div style="margin-bottom:8px">${objChips}</div>
       ${pRow('Objetivos secundarios', v('obj_sec_otro'))}
-      ${pRow('Plazo', r('plazo'))}
       ${motivRows}
     ${secClose()}
 
@@ -3603,7 +3594,6 @@ function submitForm() {
     { section: '7. Objetivos', rows: [
       ['Objetivo principal', getChecked('objetivo')],
       ['Secundarios', getVal('obj_sec_otro')],
-      ['Plazo', getRadio('plazo')],
     ]},
     { section: '8. Sueño e Hidratación', rows: [
       ['Levantarse', getVal('hora_levantarse')], ['Acostarse', getVal('hora_acostarse')],
@@ -3810,8 +3800,7 @@ function exportarDatosJSON(nombre) {
       },
       objetivos: {
         principal:  chk('objetivo').join(', '),
-        secundario: v('obj_sec_otro'),
-        plazo:      rad('plazo')
+        secundario: v('obj_sec_otro')
       },
       habitos: {
         horaLevantarse: v('hora_levantarse'),
