@@ -368,7 +368,6 @@ hr.divider{border:none;border-top:1px solid var(--gray-l);margin:20px 0}
     <div class="card">
       <div class="card-title">Datos personales y objetivo</div>
       <div class="profile-grid" id="profile-grid"></div>
-      <div id="alergias-row"></div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -377,13 +376,18 @@ hr.divider{border:none;border-top:1px solid var(--gray-l);margin:20px 0}
         <div id="salud-content" style="font-size:13px;line-height:1.8;color:var(--ink)"></div>
       </div>
       <div class="card">
-        <div class="card-title">Hábitos y contexto</div>
-        <div id="habitos-content" style="font-size:13px;line-height:1.8;color:var(--ink)"></div>
+        <div class="card-title">🌙 Sueño</div>
+        <div id="sueno-content" style="font-size:13px;line-height:1.8;color:var(--ink)"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">Comidas habituales (cómo come ahora)</div>
+      <div class="card-title">💧 Hidratación</div>
+      <div id="hidratacion-content" style="font-size:13px;line-height:1.8;color:var(--ink)"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🍽️ Comidas y Alimentación</div>
       <div id="comidas-hab-content" style="font-size:13px;line-height:1.8;color:var(--ink)"></div>
     </div>
 
@@ -4516,7 +4520,7 @@ function renderPatientTab() {
   q('#paciente-title').textContent = p.nombre || 'Paciente';
   q('#paciente-sub').textContent = `${p.sexo||''} · ${p.edad?' '+p.edad+' años':''} · Plan iniciado ${new Date().toLocaleDateString('es-ES')}`;
 
-  // Profile grid
+  // Datos personales — solo 6 chips
   const grid = q('#profile-grid');
   const chips = [
     ['Sexo', p.sexo],
@@ -4525,22 +4529,10 @@ function renderPatientTab() {
     ['Peso actual', p.peso?p.peso+' kg':null],
     ['Peso objetivo', p.pesoObjetivo?p.pesoObjetivo+' kg':null],
     ['Objetivo', d?.objetivos?.principal],
-    ['Tipo alimentación', d?.alimentacion?.tipoAlimentacion],
-    ['Agua diaria', d?.habitos?.agua],
-    ['Horario sueño', (d?.habitos?.horaLevantarse&&d?.habitos?.horaAcostarse)?`${d.habitos.horaLevantarse} – ${d.habitos.horaAcostarse}`:null],
   ].filter(([,v])=>v);
   grid.innerHTML = chips.map(([k,v])=>`<div class="profile-chip"><div class="profile-chip-label">${k}</div><div class="profile-chip-val">${v}</div></div>`).join('');
 
-  // Alergias
-  const alerg = d?.alimentacion?.alergias||'Ninguna';
-  const noGusta = d?.alimentacion?.noGusta||'';
-  const alerRow = q('#alergias-row');
-  alerRow.innerHTML = '<div class="alert-row">' +
-    alerg.split(',').map(a=>a.trim()).filter(Boolean).map(a=>`<span class="alert-chip ${a==='Ninguna'?'green':'red'}">${a==='Ninguna'?'✅':'⚠️'} ${a}</span>`).join('') +
-    (noGusta?`<span class="alert-chip amber">❌ Evita: ${noGusta}</span>`:'') +
-    '</div>';
-
-  // Salud
+  // Estado de salud
   const sal = d?.salud||{};
   q('#salud-content').innerHTML = [
     kv('Enfermedades', sal.enfermedades||'No refiere'),
@@ -4550,31 +4542,68 @@ function renderPatientTab() {
     kv('Historial dietético', sal.dietaPrevia||'No'),
   ].join('') || '<em style="color:var(--gray)">Sin datos</em>';
 
-  // Hábitos
+  // Sueño
   const hab = d?.habitos||{};
-  const adh = d?.adherencia||{};
-  q('#habitos-content').innerHTML = [
+  q('#sueno-content').innerHTML = [
     kv('Levantarse', hab.horaLevantarse),
     kv('Acostarse', hab.horaAcostarse),
-    kv('Calidad sueño', hab.calidadSueño),
-    kv('Agua', hab.agua),
-    kv('Bebidas', hab.bebidas),
-    kv('Dificultades', adh.dificultades),
-    kv('No renuncia a', adh.noRenuncia),
-    kv('Comentarios', adh.comentarios),
+    kv('Calidad del sueño', hab.calidadSueño),
+    kv('Observaciones', hab.suenoObs),
   ].join('') || '<em style="color:var(--gray)">Sin datos</em>';
 
-  // Comidas habituales
+  // Hidratación
+  const hidRows = [];
+  if (hab.agua) hidRows.push(kv('Agua diaria', hab.agua));
+  if (hab.bebidas) {
+    const bebList = hab.bebidas.split(',').map(b=>b.trim()).filter(Boolean);
+    hidRows.push(
+      `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--gray);font-size:11px;text-transform:uppercase;letter-spacing:1px">Bebidas habituales:</span> `
+      + bebList.map(b=>`<span style="background:var(--sage-pale);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;color:var(--sage);margin-left:4px">${b}</span>`).join('')
+      + '</div>'
+    );
+  }
+  if (hab.cafe_tipo || hab.cafe_azucar) {
+    const cafeDetail = [hab.cafe_tipo, hab.cafe_azucar, hab.cafe_azucar_cant?`(${hab.cafe_azucar_cant})`:null].filter(Boolean).join(' · ');
+    hidRows.push(kv('Café', cafeDetail));
+  }
+  if (hab.te_azucar_cant) hidRows.push(kv('Azúcar en el té', hab.te_azucar_cant));
+  if (hab.refrescos_tipo) hidRows.push(kv('Tipo de refresco', hab.refrescos_tipo));
+  if (hab.alcohol_freq_tipos) {
+    const alcoStr = hab.alcohol_freq_tipos + (hab.alcohol_freq_otras ? ` · Otras: ${hab.alcohol_freq_otras}` : '');
+    hidRows.push(kv('Alcohol frecuente', alcoStr));
+  }
+  if (hab.hidratacionObs) hidRows.push(kv('Observaciones', hab.hidratacionObs));
+  q('#hidratacion-content').innerHTML = hidRows.join('') || '<em style="color:var(--gray)">Sin datos</em>';
+
+  // Comidas y Alimentación
   const ch = d?.comidasHabituales||{};
+  const al = d?.alimentacion||{};
   const chItems = [
     ['🌅 Desayuno', ch.desayuno],['☕ Media mañana', ch.mediaMañana],
     ['🍽️ Comida', ch.comida],['🍌 Merienda', ch.merienda],
     ['💪 Pre-entreno', ch.preEntreno],['🥤 Post-entreno', ch.postEntreno],
     ['🌙 Cena', ch.cena],['🍫 Picoteo', ch.picoteoNoche],
   ].filter(([,v])=>v&&v!=='null');
-  q('#comidas-hab-content').innerHTML = chItems.length
-    ? chItems.map(([k,v])=>`<div style="border-left:3px solid var(--sage);padding:5px 10px;margin-bottom:6px;background:var(--sage-pale);border-radius:0 8px 8px 0"><div style="font-size:10px;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:1px">${k}</div><div style="font-size:13px">${v}</div></div>`).join('')
-    : '<em style="color:var(--gray)">Sin datos registrados</em>';
+
+  let comidasHtml = '';
+  if (chItems.length) {
+    comidasHtml += `<div style="font-size:11px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Comidas habituales</div>`;
+    comidasHtml += chItems.map(([k,v])=>`<div style="border-left:3px solid var(--sage);padding:5px 10px;margin-bottom:6px;background:var(--sage-pale);border-radius:0 8px 8px 0"><div style="font-size:10px;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:1px">${k}</div><div style="font-size:13px">${v}</div></div>`).join('');
+    if (ch.extra) comidasHtml += kv('Información adicional', ch.extra);
+  }
+  if (al.tipoAlimentacion || al.alergias || al.noGusta || al.gustos) {
+    comidasHtml += `<div style="font-size:11px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-top:${chItems.length?'16px':'0'};margin-bottom:8px">Tipo de Alimentación y Preferencias</div>`;
+    if (al.tipoAlimentacion) comidasHtml += kv('Tipo de alimentación', al.tipoAlimentacion);
+    if (al.alergias) {
+      comidasHtml += `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--gray);font-size:11px;text-transform:uppercase;letter-spacing:1px">Alergias / Intolerancias:</span> `
+        + al.alergias.split(',').map(a=>a.trim()).filter(Boolean).map(a=>`<span style="background:${a==='Ninguna'?'var(--sage-pale)':'#fdf0f0'};border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;color:${a==='Ninguna'?'var(--sage)':'#c0392b'};margin-left:4px">${a==='Ninguna'?'✅':'⚠️'} ${a}</span>`).join('')
+        + '</div>';
+    }
+    if (al.noGusta) comidasHtml += kv('❌ Alimentos a evitar', al.noGusta);
+    if (al.gustos) comidasHtml += kv('✅ Alimentos que le gustan', al.gustos);
+    if (al.disponible) comidasHtml += kv('Disponibles', al.disponible);
+  }
+  q('#comidas-hab-content').innerHTML = comidasHtml || '<em style="color:var(--gray)">Sin datos registrados</em>';
 
   // TDEE
   const tdeeCont = q('#tdee-content');
