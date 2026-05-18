@@ -1875,12 +1875,43 @@
       <div class="field">
         <label>Bebidas habituales (además de agua)</label>
         <div class="pill-group">
-          <input type="checkbox" name="bebidas" id="beb-cafe" value="Café"><label for="beb-cafe">☕ Café</label>
-          <input type="checkbox" name="bebidas" id="beb-te" value="Té/Infusión"><label for="beb-te">🍵 Té/Infusión</label>
+          <input type="checkbox" name="bebidas" id="beb-cafe" value="Café" onchange="toggleBebDetalle('cafe')"><label for="beb-cafe">☕ Café</label>
+          <input type="checkbox" name="bebidas" id="beb-te" value="Té/Infusión" onchange="toggleBebDetalle('te')"><label for="beb-te">🍵 Té/Infusión</label>
           <input type="checkbox" name="bebidas" id="beb-refrescos" value="Refrescos con azúcar"><label for="beb-refrescos">🥤 Refrescos</label>
           <input type="checkbox" name="bebidas" id="beb-zumo" value="Zumos"><label for="beb-zumo">🍊 Zumos</label>
           <input type="checkbox" name="bebidas" id="beb-alcohol" value="Alcohol (ocasional)"><label for="beb-alcohol">🍷 Alcohol (ocas.)</label>
           <input type="checkbox" name="bebidas" id="beb-alco-freq" value="Alcohol (frecuente)"><label for="beb-alco-freq">🍺 Alcohol (freq.)</label>
+        </div>
+
+        <!-- ── Sub-detalle Café ── -->
+        <div id="det-cafe" style="display:none;margin-top:12px;background:#fffaf4;border:1.5px solid #e8d5b5;border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:800;color:#a06820;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">☕ ¿Cómo tomas el café?</div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;font-weight:700;color:var(--gray);margin-bottom:6px">Tipo</div>
+            <div class="pill-group">
+              <input type="radio" name="cafe_tipo" id="cafe-solo"    value="Solo">    <label for="cafe-solo">Solo</label>
+              <input type="radio" name="cafe_tipo" id="cafe-cortado" value="Cortado"> <label for="cafe-cortado">Cortado</label>
+              <input type="radio" name="cafe_tipo" id="cafe-leche"   value="Con leche"><label for="cafe-leche">Con leche</label>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gray);margin-bottom:6px">¿Con azúcar?</div>
+            <div class="pill-group">
+              <input type="radio" name="cafe_azucar" id="cafe-az-no" value="Sin azúcar" onchange="toggleCafeAzucarDetalle()"><label for="cafe-az-no">Sin azúcar</label>
+              <input type="radio" name="cafe_azucar" id="cafe-az-si" value="Con azúcar" onchange="toggleCafeAzucarDetalle()"><label for="cafe-az-si">Con azúcar</label>
+            </div>
+            <div id="det-cafe-az" style="display:none;margin-top:8px">
+              <input id="cafe_azucar_cant" type="text" placeholder="Ej: 1 cucharadita, 2 sobres…"
+                style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Sub-detalle Té ── -->
+        <div id="det-te" style="display:none;margin-top:12px;background:#f5faf6;border:1.5px solid #b8d8c4;border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:800;color:#3d6b4f;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🍵 ¿El té con azúcar?</div>
+          <input id="te_azucar_cant" type="text" placeholder="Ej: Sin azúcar, 1 cucharadita, 1 sobre…"
+            style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
         </div>
       </div>
       <div class="field full">
@@ -2483,6 +2514,19 @@ function toggleHorarioTipo() {
 }
 
 // ── CONDICIONALES GENÉRICOS ───────────────────
+function toggleBebDetalle(tipo) {
+  var checked = document.getElementById('beb-' + tipo).checked;
+  document.getElementById('det-' + tipo).style.display = checked ? '' : 'none';
+  if (!checked && tipo === 'cafe') {
+    document.querySelectorAll('[name="cafe_tipo"],[name="cafe_azucar"]').forEach(function(r){ r.checked = false; });
+    document.getElementById('det-cafe-az').style.display = 'none';
+  }
+}
+function toggleCafeAzucarDetalle() {
+  var si = document.getElementById('cafe-az-si').checked;
+  document.getElementById('det-cafe-az').style.display = si ? '' : 'none';
+}
+
 // Muestra/oculta detEl según si radioId está checked
 function toggleCondicional(radioId, detEl) {
   const radio = document.getElementById(radioId);
@@ -3737,8 +3781,12 @@ function exportarDatosJSON(nombre) {
         horaAcostarse:  v('hora_acostarse'),
         calidadSueño:   rad('calidad_sueño'),
         suenoObs:       v('sueno_obs'),
-        agua:           v('agua'),
-        bebidas:        chk('bebidas').join(', ')
+        agua:             v('agua'),
+        bebidas:          chk('bebidas').join(', '),
+        cafe_tipo:        rad('cafe_tipo'),
+        cafe_azucar:      rad('cafe_azucar'),
+        cafe_azucar_cant: v('cafe_azucar_cant'),
+        te_azucar_cant:   v('te_azucar_cant')
       },
       adherencia: {
         dificultades: chk('dificultad').join(', '),
