@@ -4653,10 +4653,32 @@ function renderSemanaTab() {
 
   // Rutina
   const rut = d?.rutina||{};
+  let _horStr = '';
+  if (rut.horarioTipo === 'Horario fijo' && (rut.trabajoInicio || rut.trabajoFin)) {
+    _horStr = [rut.trabajoInicio, rut.trabajoFin].filter(Boolean).join(' – ');
+  } else if (rut.horarioTipo === 'Horario partido') {
+    const _p = [];
+    if (rut.partidoManIni || rut.partidoManFin) _p.push('Mañana: ' + [rut.partidoManIni, rut.partidoManFin].filter(Boolean).join('–'));
+    if (rut.partidoTarIni || rut.partidoTarFin) _p.push('Tarde: ' + [rut.partidoTarIni, rut.partidoTarFin].filter(Boolean).join('–'));
+    _horStr = _p.join(' / ');
+  } else if (rut.horarioTipo === 'Turnos rotativos') {
+    const _t = [];
+    if (rut.turManIni || rut.turManFin) _t.push('Mañana: ' + [rut.turManIni, rut.turManFin].filter(Boolean).join('–'));
+    if (rut.turTarIni || rut.turTarFin) _t.push('Tarde: ' + [rut.turTarIni, rut.turTarFin].filter(Boolean).join('–'));
+    if (rut.turNocIni || rut.turNocFin) _t.push('Noche: ' + [rut.turNocIni, rut.turNocFin].filter(Boolean).join('–'));
+    _horStr = _t.join(' · ');
+  } else if (rut.horarioTipo === 'Autónomo / variable' && rut.autoDescripcion) {
+    _horStr = rut.autoDescripcion;
+  }
+  if (rut.claseInicio || rut.claseFin) {
+    const _e = 'Clases: ' + [rut.claseInicio, rut.claseFin].filter(Boolean).join(' – ');
+    _horStr = _horStr ? _horStr + ' · ' + _e : _e;
+  }
   const rutCont = q('#rutina-content');
   rutCont.innerHTML = [
     kv('Situación laboral', rut.situacionLaboral),
     kv('Tipo de jornada', rut.horarioTipo),
+    kv('Horario', _horStr),
     kv('Pasos estimados', rut.neatPasos),
     kv('Desplazamiento', rut.neatDesplazamiento),
   ].join('') || '<em style="color:var(--gray)">Sin datos registrados</em>';
@@ -5167,8 +5189,14 @@ function renderSemanaTab() {
   const actCont=q('#actividades-content');
   if(actCont) actCont.innerHTML=acts.length?acts.map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--gray-l)"><span style="background:var(--sage);color:#fff;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700">${a.modalidad||'Actividad'}</span> <strong>${a.tipo||'—'}</strong> ${a.inicio&&a.fin?`· ${a.inicio}–${a.fin}`:''} ${a.dias?.length?`<span style="color:var(--gray);font-size:12px">(${a.dias.join(', ')})</span>`:''}</div>`).join(''):'<em style="color:var(--gray)">Sin actividades registradas</em>';
   const rut=d?.rutina||{};
+  let _hs='';
+  if(rut.horarioTipo==='Horario fijo'&&(rut.trabajoInicio||rut.trabajoFin)){_hs=[rut.trabajoInicio,rut.trabajoFin].filter(Boolean).join(' – ');}
+  else if(rut.horarioTipo==='Horario partido'){const _p=[];if(rut.partidoManIni||rut.partidoManFin)_p.push('Mañana: '+[rut.partidoManIni,rut.partidoManFin].filter(Boolean).join('–'));if(rut.partidoTarIni||rut.partidoTarFin)_p.push('Tarde: '+[rut.partidoTarIni,rut.partidoTarFin].filter(Boolean).join('–'));_hs=_p.join(' / ');}
+  else if(rut.horarioTipo==='Turnos rotativos'){const _t=[];if(rut.turManIni||rut.turManFin)_t.push('Mañana: '+[rut.turManIni,rut.turManFin].filter(Boolean).join('–'));if(rut.turTarIni||rut.turTarFin)_t.push('Tarde: '+[rut.turTarIni,rut.turTarFin].filter(Boolean).join('–'));if(rut.turNocIni||rut.turNocFin)_t.push('Noche: '+[rut.turNocIni,rut.turNocFin].filter(Boolean).join('–'));_hs=_t.join(' · ');}
+  else if(rut.horarioTipo==='Autónomo / variable'&&rut.autoDescripcion){_hs=rut.autoDescripcion;}
+  if(rut.claseInicio||rut.claseFin){const _e='Clases: '+[rut.claseInicio,rut.claseFin].filter(Boolean).join(' – ');_hs=_hs?_hs+' · '+_e:_e;}
   const rutCont=q('#rutina-content');
-  if(rutCont) rutCont.innerHTML=[kv('Situación laboral',rut.situacionLaboral),kv('Tipo jornada',rut.horarioTipo),kv('Pasos',rut.neatPasos),kv('Desplazamiento',rut.neatDesplazamiento)].join('')||'<em style="color:var(--gray)">Sin datos</em>';
+  if(rutCont) rutCont.innerHTML=[kv('Situación laboral',rut.situacionLaboral),kv('Tipo de jornada',rut.horarioTipo),kv('Horario',_hs),kv('Pasos estimados',rut.neatPasos),kv('Desplazamiento',rut.neatDesplazamiento)].join('')||'<em style="color:var(--gray)">Sin datos</em>';
 }
 
 // ─ EXPORT TAB ────────────────────────────────────────────────
