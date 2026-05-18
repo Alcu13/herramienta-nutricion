@@ -1877,10 +1877,10 @@
         <div class="pill-group">
           <input type="checkbox" name="bebidas" id="beb-cafe" value="Café" onchange="toggleBebDetalle('cafe')"><label for="beb-cafe">☕ Café</label>
           <input type="checkbox" name="bebidas" id="beb-te" value="Té/Infusión" onchange="toggleBebDetalle('te')"><label for="beb-te">🍵 Té/Infusión</label>
-          <input type="checkbox" name="bebidas" id="beb-refrescos" value="Refrescos con azúcar"><label for="beb-refrescos">🥤 Refrescos</label>
+          <input type="checkbox" name="bebidas" id="beb-refrescos" value="Refrescos" onchange="toggleBebDetalle('refrescos')"><label for="beb-refrescos">🥤 Refrescos</label>
           <input type="checkbox" name="bebidas" id="beb-zumo" value="Zumos"><label for="beb-zumo">🍊 Zumos</label>
           <input type="checkbox" name="bebidas" id="beb-alcohol" value="Alcohol (ocasional)"><label for="beb-alcohol">🍷 Alcohol (ocas.)</label>
-          <input type="checkbox" name="bebidas" id="beb-alco-freq" value="Alcohol (frecuente)"><label for="beb-alco-freq">🍺 Alcohol (freq.)</label>
+          <input type="checkbox" name="bebidas" id="beb-alco-freq" value="Alcohol (frecuente)" onchange="toggleBebDetalle('alco-freq')"><label for="beb-alco-freq">🍺 Alcohol (freq.)</label>
         </div>
 
         <!-- ── Sub-detalle Café ── -->
@@ -1912,6 +1912,30 @@
           <div style="font-size:11px;font-weight:800;color:#3d6b4f;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🍵 ¿El té con azúcar?</div>
           <input id="te_azucar_cant" type="text" placeholder="Ej: Sin azúcar, 1 cucharadita, 1 sobre…"
             style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
+        </div>
+
+        <!-- ── Sub-detalle Refrescos ── -->
+        <div id="det-refrescos" style="display:none;margin-top:12px;background:#f0f7ff;border:1.5px solid #aecde8;border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:800;color:#1565c0;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🥤 ¿Qué tipo de refresco?</div>
+          <div class="pill-group">
+            <input type="radio" name="refrescos_tipo" id="ref-zero" value="Zero"><label for="ref-zero">Zero</label>
+            <input type="radio" name="refrescos_tipo" id="ref-zero-zero" value="Zero Zero"><label for="ref-zero-zero">Zero Zero</label>
+            <input type="radio" name="refrescos_tipo" id="ref-normal" value="Normal"><label for="ref-normal">Normal</label>
+          </div>
+        </div>
+
+        <!-- ── Sub-detalle Alcohol frecuente ── -->
+        <div id="det-alco-freq" style="display:none;margin-top:12px;background:#fdf5f0;border:1.5px solid #e8c5a8;border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:800;color:#a04820;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">🍺 ¿Qué tipo de alcohol?</div>
+          <div class="pill-group">
+            <input type="checkbox" name="alcohol_freq_tipo" id="alco-cerveza" value="Cerveza"><label for="alco-cerveza">🍺 Cerveza</label>
+            <input type="checkbox" name="alcohol_freq_tipo" id="alco-vino" value="Vino"><label for="alco-vino">🍷 Vino</label>
+            <input type="checkbox" name="alcohol_freq_tipo" id="alco-otras" value="Otras" onchange="toggleAlcoOtras()"><label for="alco-otras">🥃 Otras</label>
+          </div>
+          <div id="det-alco-otras" style="display:none;margin-top:10px">
+            <input id="alco_otras_cual" type="text" placeholder="Ej: Gin tonic, Whisky, Combinados…"
+              style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
+          </div>
         </div>
       </div>
       <div class="field full">
@@ -2517,14 +2541,27 @@ function toggleHorarioTipo() {
 function toggleBebDetalle(tipo) {
   var checked = document.getElementById('beb-' + tipo).checked;
   document.getElementById('det-' + tipo).style.display = checked ? '' : 'none';
-  if (!checked && tipo === 'cafe') {
-    document.querySelectorAll('[name="cafe_tipo"],[name="cafe_azucar"]').forEach(function(r){ r.checked = false; });
-    document.getElementById('det-cafe-az').style.display = 'none';
+  if (!checked) {
+    if (tipo === 'cafe') {
+      document.querySelectorAll('[name="cafe_tipo"],[name="cafe_azucar"]').forEach(function(r){ r.checked = false; });
+      document.getElementById('det-cafe-az').style.display = 'none';
+    } else if (tipo === 'refrescos') {
+      document.querySelectorAll('[name="refrescos_tipo"]').forEach(function(r){ r.checked = false; });
+    } else if (tipo === 'alco-freq') {
+      document.querySelectorAll('[name="alcohol_freq_tipo"]').forEach(function(r){ r.checked = false; });
+      document.getElementById('det-alco-otras').style.display = 'none';
+      document.getElementById('alco_otras_cual').value = '';
+    }
   }
 }
 function toggleCafeAzucarDetalle() {
   var si = document.getElementById('cafe-az-si').checked;
   document.getElementById('det-cafe-az').style.display = si ? '' : 'none';
+}
+function toggleAlcoOtras() {
+  var checked = document.getElementById('alco-otras').checked;
+  document.getElementById('det-alco-otras').style.display = checked ? '' : 'none';
+  if (!checked) document.getElementById('alco_otras_cual').value = '';
 }
 
 // Muestra/oculta detEl según si radioId está checked
@@ -3783,10 +3820,13 @@ function exportarDatosJSON(nombre) {
         suenoObs:       v('sueno_obs'),
         agua:             v('agua'),
         bebidas:          chk('bebidas').join(', '),
-        cafe_tipo:        rad('cafe_tipo'),
-        cafe_azucar:      rad('cafe_azucar'),
-        cafe_azucar_cant: v('cafe_azucar_cant'),
-        te_azucar_cant:   v('te_azucar_cant')
+        cafe_tipo:          rad('cafe_tipo'),
+        cafe_azucar:        rad('cafe_azucar'),
+        cafe_azucar_cant:   v('cafe_azucar_cant'),
+        te_azucar_cant:     v('te_azucar_cant'),
+        refrescos_tipo:     rad('refrescos_tipo'),
+        alcohol_freq_tipos: chk('alcohol_freq_tipo').join(', '),
+        alcohol_freq_otras: v('alco_otras_cual')
       },
       adherencia: {
         dificultades: chk('dificultad').join(', '),
