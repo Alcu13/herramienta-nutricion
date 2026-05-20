@@ -34,6 +34,26 @@ Estado: pendiente.
 
 ## Mejoras / housekeeping
 
+### TASK-002 — Documentar el colapso de outputs de Claude Code en CLAUDE.md
+Detectado: sesión de verificación de coautoría, 2026-05-20.
+Síntoma: Claude Code colapsa outputs largos de terminal con "+N lines
+(ctrl+o to expand)". Claude puede concluir sobre contenido que el
+usuario no puede ver sin expandir manualmente.
+Acción: añadir en "Working agreement with Claude Code" el aviso:
+"Claude Code's terminal interface collapses long outputs by default
+(shown as '+N lines (ctrl+o to expand)'). Conclusions drawn over
+collapsed sections must be verified by running the command in a
+separate terminal, or by expanding manually with ctrl+o. Never approve
+critical decisions based on collapsed output."
+Estado: pendiente.
+
+### TASK-003 — Verificar en GitHub que los commits limpios no llevan Co-Authored-By
+Detectado: sesión de verificación de coautoría, 2026-05-20.
+Al primer push, comprobar en la interfaz web de GitHub que los commits
+3fae597, 4aefee6 y 3d83752 no muestran coautoría en el cuerpo público.
+Si alguno la llevara, enmendar antes de cerrar el push.
+Estado: pendiente (bloqueado hasta el primer push).
+
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
