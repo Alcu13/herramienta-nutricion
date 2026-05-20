@@ -246,3 +246,7 @@ Roadmap mapping (priority order):
   this was skipped).
 - Before creating any function-wrapping pattern, re-read "Override pattern & its trap".
 - Small commits, imperative messages, one piece per commit.
+- **Commit authorship.** Commits in this repo are signed by the user
+  only. Do not add "Co-Authored-By: Claude" or any AI-assistant
+  attribution line in commit messages. This is a project rule, not
+  per-session preference.
