@@ -9556,11 +9556,6 @@ function renderLibraryTab() {
   var catOpts=allCats.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
   var metsHtml=''; try { metsHtml=typeof buildMETRefTable==='function'?buildMETRefTable():typeof renderMETLibrary==='function'?renderMETLibrary():''; } catch(e){}
   cont.innerHTML=[
-    '<div style="display:flex;gap:4px;margin-bottom:20px;align-items:center;flex-wrap:wrap">',
-      '<button id="lib-btn-frescos" onclick="showLibTab(\'frescos\')" style="padding:8px 16px;border-radius:10px;border:2px solid var(--sage);background:var(--sage);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🍽️ Alimentos</button>',
-      '<button id="lib-btn-recetas" onclick="showLibTab(\'recetas\')" style="padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">📋 Recetas</button>',
-      '<button id="lib-btn-mets"    onclick="showLibTab(\'mets\')"    style="padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🏃 Actividades/Deportes</button>',
-    '</div>',
     '<div id="lib-frescos">',
       '<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">',
         '<input id="fresh-search" type="text" placeholder="🔍 Buscar alimento..." oninput="filterFreshFoods(this.value,document.getElementById(\'fresh-cat\').value)" style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none">',
@@ -9596,12 +9591,29 @@ function renderLibraryTab() {
       '</div>',
       '<div style="margin-top:8px;font-size:11px;color:var(--gray);font-style:italic">* Valores por 100g. '+allFoods.length+' alimentos registrados.</div>',
     '</div>',
-    '<div id="lib-recetas" style="display:none"></div>',
-    '<div id="lib-mets" style="display:none">',
-      '<div style="display:flex;justify-content:flex-end;margin-bottom:14px">',
-        '<button onclick="showAddActivityForm()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--amber);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">＋ Añadir actividad</button>',
+    '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:4px">',
+      '<button id="lib-btn-ofr" onclick="toggleLibSection(\'lib-ofr\',this)" style="padding:8px 14px;background:transparent;border:none;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit">🏪 Open Food Facts <span class="lib-arrow">▸</span></button>',
+      '<div id="lib-ofr" style="display:none;padding:8px 0 0">',
+        '<div style="margin-bottom:14px;padding:12px 16px;background:#e8f4fd;border-radius:10px;font-size:12px;color:#1565c0"><strong>🏪 Open Food Facts</strong> — Base de datos colaborativa con millones de productos de supermercado. Los datos se obtienen en tiempo real. <a href="https://es.openfoodfacts.org" target="_blank" style="color:#1565c0">openfoodfacts.org</a></div>',
+        '<div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">',
+          '<input id="ofr-lib-input" type="text" placeholder="🔍 Buscar producto (ej: leche Asturiana, yogur Danone, atún Calvo...)" oninput="debouncedOFRLib(this.value)" style="flex:1;padding:10px 16px;border:2px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;outline:none">',
+          '<div id="ofr-lib-loader" style="display:none;color:var(--sage);font-size:13px;white-space:nowrap">🔄 Buscando...</div>',
+        '</div>',
+        '<div id="ofr-lib-results" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px"></div>',
       '</div>',
-      metsHtml,
+    '</div>',
+    '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:4px">',
+      '<button id="lib-btn-mets" onclick="toggleLibSection(\'lib-mets\',this)" style="padding:8px 14px;background:transparent;border:none;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit">🏃 Actividades/Deportes <span class="lib-arrow">▸</span></button>',
+      '<div id="lib-mets" style="display:none;padding:8px 0 0">',
+        '<div style="display:flex;justify-content:flex-end;margin-bottom:14px">',
+          '<button onclick="showAddActivityForm()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--amber);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">＋ Añadir actividad</button>',
+        '</div>',
+        metsHtml,
+      '</div>',
+    '</div>',
+    '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:4px">',
+      '<button id="lib-btn-recetas" onclick="toggleLibSection(\'lib-recetas\',this)" style="padding:8px 14px;background:transparent;border:none;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit">📋 Recetas <span class="lib-arrow">▸</span></button>',
+      '<div id="lib-recetas" style="display:none;padding:8px 0 0"></div>',
     '</div>',
   ].join('');
   if (typeof filterFreshFoods==='function') filterFreshFoods('','');
@@ -9614,6 +9626,16 @@ function showLibTab(tab) {
     if (btn) { btn.style.background=isAct?'var(--sage)':'transparent'; btn.style.color=isAct?'#fff':'var(--ink)'; btn.style.borderColor=isAct?'var(--sage)':'var(--border)'; }
   });
   if (tab==='recetas') renderRecipesPanel();
+}
+
+function toggleLibSection(id, btn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  var arrow = btn && btn.querySelector('.lib-arrow');
+  if (arrow) arrow.textContent = open ? '▸' : '▾';
+  if (!open && id === 'lib-recetas') renderRecipesPanel();
 }
 
 // ══════════════════════════════════════════════════════════════
