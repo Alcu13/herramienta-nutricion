@@ -12,7 +12,6 @@ Seguimiento.xlsm
 *.pdf
 
 # Archivos internos de desarrollo
-CLAUDE.md
 food_db_names.txt
 excel_foods.txt
 *.txt
