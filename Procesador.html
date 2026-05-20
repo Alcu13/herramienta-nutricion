@@ -5818,10 +5818,41 @@ function updateHeaderPatient(nombre) {
 
 // ─ FOOD AUTOCOMPLETE ─────────────────────────────────────────
 function initFoodList() {
-  const dl = document.createElement('datalist');
-  dl.id = 'food-list';
-  Object.keys(FOODS).forEach(f => { const o=document.createElement('option'); o.value=f; dl.appendChild(o); });
-  document.body.appendChild(dl);
+  var dl = document.getElementById('food-list');
+  if (!dl) { dl = document.createElement('datalist'); dl.id = 'food-list'; document.body.appendChild(dl); }
+  dl.innerHTML = '';
+  var seen = Object.create(null);
+  FOOD_DB.forEach(function(f) {
+    var k = _normFood(f.n);
+    if (!seen[k] || Object.keys(f).length > Object.keys(seen[k]).length) seen[k] = f;
+  });
+  var addedNorm = Object.create(null); // dedup por _normFood(value)
+  function addOpt(val) {
+    if (!val) return;
+    var nk = _normFood(val);
+    if (addedNorm[nk]) return;
+    addedNorm[nk] = true;
+    var o = document.createElement('option');
+    o.value = val;
+    dl.appendChild(o);
+  }
+  Object.keys(seen).forEach(function(k) {
+    var f = seen[k];
+    var canonNorm = _normFood(f.n);
+    addOpt(f.n);
+    // Añadir forma sin acentos solo si el canónico tiene acentos
+    // (toLowerCase conserva acentos; si difiere de _normFood, hay acentos)
+    if (f.n.toLowerCase() !== canonNorm) {
+      var oNorm = document.createElement('option');
+      oNorm.value = canonNorm;
+      dl.appendChild(oNorm);
+    }
+    var aliases = (typeof FOOD_ALIASES !== 'undefined' && FOOD_ALIASES[f.n]) ? FOOD_ALIASES[f.n] : [];
+    aliases.forEach(function(a) {
+      if (_normFood(a) !== canonNorm) addOpt(a);
+      if (a.toLowerCase() !== _normFood(a)) addOpt(_normFood(a));
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -6793,6 +6824,20 @@ function _normAccents(s) {
   return s.replace(/[áéíóúüÁÉÍÓÚàèìòùñÑ]/g, function(c){ return map[c]||c; });
 }
 
+// ── Normalizador único para nombres de alimentos ──────────
+// NFD + filtro por rango 0x0300-0x036F sin regex literal (evita
+// problemas de encoding). Compartido por _lookupFoodSimple,
+// initFoodList y filterFreshFoods. No duplicar esta lógica.
+function _normFood(s) {
+  if (!s) return '';
+  var nfd = s.normalize('NFD'), out = '';
+  for (var i = 0; i < nfd.length; i++) {
+    var c = nfd.charCodeAt(i);
+    if (c < 0x0300 || c > 0x036F) out += nfd[i];
+  }
+  return out.toLowerCase().trim();
+}
+
 function lookupFood(name) {
   if (!name || name.length < 2) return null;
   var low = _normAccents(name.toLowerCase().trim());
@@ -7675,34 +7720,6 @@ function buildOFRFoodRow(dtId, mealId, opt, food) {
   return row;
 }
 
-// ── Override saveFoodField: recalc using _per100g if OFR ──
-var _origSaveFoodField2 = saveFoodField;
-function saveFoodField(dtId, mealId, opt, fid, field, value) {
-  var dt   = state.dayTypes.find(function(d){ return d.id===dtId; }); if(!dt) return;
-  var meal = dt.meals.find(function(m){ return m.id===mealId; });     if(!meal) return;
-  var food = (meal.options[opt]||[]).find(function(f){ return f.fid===fid; }); if(!food) return;
-
-  if (food._isOFR && food._per100g && field === 'grams') {
-    // OFR product: recalc from _per100g
-    food.grams = value;
-    var g = parseFloat(value) || 0;
-    var f = g / 100;
-    food.kcal  = Math.round(food._per100g.kcal  * f * 10) / 10;
-    food.prot  = Math.round(food._per100g.prot  * f * 10) / 10;
-    food.carbs = Math.round(food._per100g.carbs * f * 10) / 10;
-    food.fat   = Math.round(food._per100g.fat   * f * 10) / 10;
-    food.fiber = Math.round(food._per100g.fiber * f * 10) / 10;
-    food.measure = typeof medida==='function' ? medida(food.name, g) : '';
-    var mEl = document.getElementById('msr-'+dtId+'-'+mealId+'-'+opt+'-'+fid);
-    if (mEl) mEl.value = food.measure;
-    refreshOptionTotal(dtId, mealId, opt);
-    return;
-  }
-  _origSaveFoodField2(dtId, mealId, opt, fid, field, value);
-}
-
-
-
 // ═══════════════════════════════════════════════════════════════
 // FINAL CLEANUP — Versiones definitivas sin recursión
 // Al ser las últimas declaraciones del script, ganan el hoisting.
@@ -7862,7 +7879,41 @@ function renderMealBlock(dtId, meal) {
   return block;
 }
 
-// ── updateFood — simple state update, no _orig recursion ────
+// ── 1.1: Centralized FOOD_DB → option field mapping ─────────
+// Single source of truth: p→prot, c→ch, g→gras, kcal→kcal.
+function _foodDbToOption(dbEntry, grams) {
+  var factor = (parseFloat(grams) || 0) / 100;
+  return {
+    kcal: Math.round((dbEntry.kcal || 0) * factor * 10) / 10,
+    prot: Math.round((dbEntry.p    || 0) * factor * 10) / 10,
+    ch:   Math.round((dbEntry.c    || 0) * factor * 10) / 10,
+    gras: Math.round((dbEntry.g    || 0) * factor * 10) / 10
+  };
+}
+
+// ── 1.1: Simple lookup — exact + accent-normalized, no fuzzy ─
+// Returns {_src:'DB', e:<FOOD_DB entry>} or {_src:'FOODS', e:<FOODS entry>} or null.
+// Uses _normFood (NFD) — misma función que filterFreshFoods y initFoodList.
+// TODO 1.3: add FOOD_ALIASES pass before FOODS fallback.
+function _lookupFoodSimple(name) {
+  if (!name) return null;
+  var low = _normFood(name);
+  if (!low) return null;
+  for (var i = 0; i < FOOD_DB.length; i++) {
+    if (_normFood(FOOD_DB[i].n) === low) return { _src: 'DB', e: FOOD_DB[i] };
+  }
+  if (typeof FOODS !== 'undefined') {
+    var keys = Object.keys(FOODS);
+    for (var j = 0; j < keys.length; j++) {
+      if (_normFood(keys[j]) === low) return { _src: 'FOODS', e: FOODS[keys[j]] };
+    }
+  }
+  return null;
+}
+
+// ── 1.1: updateFood — FOOD_DB primary, FOODS fallback ────────
+// Last definition wins hoisting. Uses _lookupFoodSimple + _foodDbToOption.
+// Dual-write: ch/gras (calcOptionTotal, exportarExcel) + carbs/fat (calcSingleOptionTotal, calcLiveMacros).
 function updateFood(dtId, mealId, opt, foodIdx, key, val) {
   var dt   = state.dayTypes.find(function(d){ return d.id === dtId; }); if(!dt) return;
   var meal = dt.meals.find(function(m){ return m.id === mealId; });     if(!meal) return;
@@ -7871,24 +7922,38 @@ function updateFood(dtId, mealId, opt, foodIdx, key, val) {
   foods[foodIdx][key] = val;
 
   var food = foods[foodIdx];
-  var g  = parseFloat(food.grams) || 0;
-  var db = (typeof lookupFood === 'function') ? lookupFood(food.name) : null;
-  if (db && g) {
-    var factor = g / 100;
-    food.kcal  = Math.round((db.kcal||0)*factor*10)/10;
-    food.prot  = Math.round((db.p||0)*factor*10)/10;
-    food.carbs = Math.round((db.c||0)*factor*10)/10;
-    food.fat   = Math.round((db.g||0)*factor*10)/10;
-    food.fiber = Math.round((db.fi||0)*factor*10)/10;
+  var g    = parseFloat(food.grams) || 0;
+  var hit  = _lookupFoodSimple(food.name);
+
+  if (hit && g) {
+    var macros;
+    if (hit._src === 'DB') {
+      macros = _foodDbToOption(hit.e, g);
+    } else {
+      // FOODS entry has {kcal, ch, prot, gras} per 100g
+      var fac = g / 100;
+      macros = {
+        kcal: Math.round((hit.e.kcal || 0) * fac * 10) / 10,
+        prot: Math.round((hit.e.prot || 0) * fac * 10) / 10,
+        ch:   Math.round((hit.e.ch   || 0) * fac * 10) / 10,
+        gras: Math.round((hit.e.gras || 0) * fac * 10) / 10
+      };
+    }
+    food.kcal  = macros.kcal;
+    food.prot  = macros.prot;
+    food.ch    = macros.ch;    // calcOptionTotal + exportarExcel
+    food.gras  = macros.gras;  // calcOptionTotal + exportarExcel
+    food.carbs = macros.ch;    // compat: calcSingleOptionTotal, calcLiveMacros
+    food.fat   = macros.gras;  // compat: calcSingleOptionTotal, calcLiveMacros
     food._dbFound = true;
   }
+
   if (key === 'grams') {
     food.measure = (typeof medida === 'function') ? medida(food.name, g) : '';
     var mEl = document.getElementById('measure-' + dtId + '-' + mealId + '-' + opt + '-' + foodIdx);
     if (mEl) mEl.value = food.measure;
   }
 
-  // Update total display
   var mealBlock = document.getElementById('meal-' + mealId);
   if (mealBlock) {
     var cols = mealBlock.querySelectorAll('.option-col');
@@ -7933,18 +7998,31 @@ function saveFoodField(dtId, mealId, opt, fid, field, value) {
     return;
   }
 
-  // Regular foods: lookup in DB
-  var g  = parseFloat(food.grams) || 0;
-  var db = (typeof lookupFood === 'function') ? lookupFood(food.name) : null;
-  if (db && g) {
-    var factor = g / 100;
-    food.kcal  = Math.round((db.kcal||0)*factor*10)/10;
-    food.prot  = Math.round((db.p||0)*factor*10)/10;
-    food.carbs = Math.round((db.c||0)*factor*10)/10;
-    food.fat   = Math.round((db.g||0)*factor*10)/10;
-    food.fiber = Math.round((db.fi||0)*factor*10)/10;
+  // Regular foods: FOOD_DB primary, FOODS fallback — dual-write ch/gras + carbs/fat
+  var g   = parseFloat(food.grams) || 0;
+  var hit = _lookupFoodSimple(food.name);
+  if (hit && g) {
+    var macros;
+    if (hit._src === 'DB') {
+      macros     = _foodDbToOption(hit.e, g);
+      food.fiber = Math.round((hit.e.fi || 0) * g / 100 * 10) / 10;
+    } else {
+      var fac = g / 100;
+      macros = {
+        kcal: Math.round((hit.e.kcal || 0) * fac * 10) / 10,
+        prot: Math.round((hit.e.prot || 0) * fac * 10) / 10,
+        ch:   Math.round((hit.e.ch   || 0) * fac * 10) / 10,
+        gras: Math.round((hit.e.gras || 0) * fac * 10) / 10
+      };
+    }
+    food.kcal  = macros.kcal;
+    food.prot  = macros.prot;
+    food.ch    = macros.ch;    // calcOptionTotal + exportarExcel
+    food.gras  = macros.gras;  // calcOptionTotal + exportarExcel
+    food.carbs = macros.ch;    // refreshOptionTotal, calcSingleOptionTotal, calcLiveMacros
+    food.fat   = macros.gras;  // refreshOptionTotal, calcSingleOptionTotal, calcLiveMacros
     food._dbFound = true;
-  } else if (!db && field === 'name') {
+  } else if (!hit && field === 'name') {
     food._dbFound = false;
   }
 
@@ -8206,10 +8284,7 @@ function showLibTab(tab) {
 function filterFreshFoods(q, cat) {
   var all = (typeof FOOD_DB !== 'undefined') ? FOOD_DB : [];
 
-  // Normalizar: quitar acentos y pasar a minúsculas
-  function norm(s) {
-    return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-  }
+  var norm = _normFood;   // normalizador compartido — definido en _normFood()
 
   var words = norm(q).split(/\s+/).filter(function(w){ return w.length > 0; });
 
@@ -8358,17 +8433,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Mark fresh foods as soon as FOOD_DB is available
   setTimeout(markFreshFoods, 50);
 
-  // Init food autocomplete datalist
-  if (typeof FOOD_DB !== 'undefined') {
-    var dl = document.getElementById('food-list');
-    if (!dl) { dl = document.createElement('datalist'); dl.id = 'food-list'; document.body.appendChild(dl); }
-    dl.innerHTML = '';
-    FOOD_DB.forEach(function(f) {
-      var opt = document.createElement('option');
-      opt.value = f.n + (f.brand ? ' (' + f.brand + ')' : '');
-      dl.appendChild(opt);
-    });
-  }
+  // Init food autocomplete datalist (dedup + sin brand-suffix)
+  initFoodList();
 
   // Ensure sex-based field appears in load form
   var sexoInps = document.querySelectorAll('input[name="sexo"]');
