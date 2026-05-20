@@ -34,16 +34,18 @@ Estado: pendiente.
 
 ## Mejoras / housekeeping
 
-### TASK-001 — Versionar PIECE-1-SPEC.md y PIECE-2-SPEC.md
-Detectado: tras commit 5a1a5d1.
-Los dos archivos de especificación de pieza están en la carpeta del
-repo pero no versionados. Misma situación que el CLAUDE.md antes del
-commit f1bf229.
-Acción: git add ambos + commit "Versiona especificaciones de pieza".
-Estado: pendiente.
-
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
 severidad y estado. Cerrar una entrada = mover a una sección
 "## Cerrados" al final con su commit asociado.
+
+## Cerrados
+
+### TASK-001 — Versionar PIECE-1-SPEC.md y PIECE-2-SPEC.md
+Detectado: tras commit 5a1a5d1.
+Los dos archivos de especificación de pieza estaban en la carpeta del
+repo pero no versionados. Misma situación que el CLAUDE.md antes del
+commit f1bf229.
+Acción: git add ambos + commit "Versiona especificaciones de pieza".
+Estado: cerrado — commit 4aefee6.
