@@ -6,19 +6,6 @@ diagnóstico y commit, en el orden acordado con el mentor.
 
 ## Bugs
 
-### BUG-002 — "Desde receta" no rellena ch ni gras en macros de opción
-Detectado: tras cerrar 1.2.
-Síntoma: al añadir una receta con varios alimentos a una opción del
-plan, el total muestra "892 kcal · CH 0g · P 52.4g · G 0g". La
-proteína y las kcal suman, pero ch y gras quedan a cero. Añadir
-alimentos uno a uno con el autocompletado sí calcula bien todos los
-campos.
-Hipótesis: la función que carga ingredientes de receta no rellena
-todos los campos del objeto de opción ({name, grams, measure, kcal,
-ch, prot, gras}); olvida ch y gras.
-Severidad: clínica. Las recetas dan macros falsos.
-Estado: pendiente.
-
 ## Mejoras / housekeeping
 
 ### TASK-002 — Documentar el colapso de outputs de Claude Code en CLAUDE.md
@@ -124,6 +111,24 @@ por un wrapper que llame a la lógica nueva.
 Riesgo: bajo (deuda técnica, no funcional).
 Estado: pendiente.
 
+### TASK-006 — Unificar nomenclatura ch/gras ↔ carbs/fat (deuda técnica)
+Detectado: durante el diagnóstico de BUG-002.
+El código mantiene dual-write deliberado de cada food object con dos
+pares de nombres para los mismos macros: ch/gras (usado por
+calcOptionTotal, exportarExcel) y carbs/fat (usado por la versión
+activa de calcSingleOptionTotal en línea 8076, y calcLiveMacros).
+La nota interna del proyecto está en línea 7926. La duplicación es
+fuente recurrente de bugs como BUG-002, donde una ruta de escritura
+olvidó uno de los dos pares.
+Acción: en una pieza dedicada, unificar a un solo par —probablemente
+carbs/fat, por ser el que usan las funciones activas más recientes—,
+migrar todas las lecturas y escrituras, y eliminar el dual-write.
+Riesgo: medio. Toca zona crítica de cálculo de macros (la misma que
+se estabilizó en BUG-001). Requiere su propio diagnóstico, plan y
+commit aislado.
+Estado: pendiente, prioridad MEDIA (deuda técnica activa que ya ha
+producido al menos un bug — BUG-002).
+
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
@@ -131,6 +136,19 @@ severidad y estado. Cerrar una entrada = mover a una sección
 "## Cerrados" al final con su commit asociado.
 
 ## Cerrados
+
+### BUG-002 — "Desde receta" no rellena ch ni gras en macros de opción
+Detectado: tras cerrar 1.2.
+Síntoma: al añadir una receta con varios alimentos a una opción del
+plan, el total muestra "892 kcal · CH 0g · P 52.4g · G 0g". La
+proteína y las kcal suman, pero ch y gras quedan a cero. Añadir
+alimentos uno a uno con el autocompletado sí calcula bien todos los
+campos.
+Hipótesis: la función que carga ingredientes de receta no rellena
+todos los campos del objeto de opción ({name, grams, measure, kcal,
+ch, prot, gras}); olvida ch y gras.
+Severidad: clínica. Las recetas dan macros falsos.
+Estado: cerrado — commit c9e840f.
 
 ### BUG-001 — Macros por día tipo idénticos en todos los días (Excel)
 Detectado: tras cerrar 1.2.
