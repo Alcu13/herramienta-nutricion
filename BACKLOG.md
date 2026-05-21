@@ -54,6 +54,74 @@ Al primer push, comprobar en la interfaz web de GitHub que los commits
 Si alguno la llevara, enmendar antes de cerrar el push.
 Estado: pendiente (bloqueado hasta el primer push).
 
+### TASK-004 — Ampliar FOOD_DB con la lista clínica del nutricionista (1.3)
+Detectado: sesión de preparación del 1.3, 2026-05-21.
+El nutricionista ha entregado una lista priorizada de ~130 alimentos
+que considera críticos para arrancar consulta. La ampliación de
+FOOD_DB debe partir de esta lista, no de criterios técnicos genéricos.
+Lista completa (categorías marcadas para revisión):
+
+PROTEÍNAS ANIMALES:
+Pechuga de pollo, Muslo de pollo deshuesado, Pechuga de pavo,
+Carne picada de ternera magra, Solomillo de ternera, Lomo de cerdo,
+Conejo, Huevos enteros, Claras de huevo pasteurizadas, Jamón serrano
+o ibérico, Salmón fresco o ahumado, Atún fresco, Atún al natural en
+conserva, Merluza, Bacalao, Sardinas frescas o en conserva, Caballa,
+Dorada, Lubina, Gambas y langostinos, Pulpo, Calamares, Mejillones
+
+LÁCTEOS:
+Leche entera, Leche semidesnatada, Leche desnatada, Yogur natural
+sin azúcares añadidos, Yogur griego natural, Queso fresco, Queso
+batido 0% grasa, Queso Cottage, Queso tierno o curado, Kéfir
+
+LEGUMBRES Y DERIVADOS:
+Lentejas, Garbanzos, Alubias blancas o pintas, Guisantes, Soja
+texturizada, Tofu firme, Tempeh, Edamame, Altramuces, Habas
+
+CEREALES Y FÉCULAS:
+Copos de avena, Harina de avena, Arroz blanco, Arroz integral, Pasta
+de trigo, Pasta integral, Quinoa, Pan integral, Pan blanco, Patata,
+Boniato o batata, Cuscús, Tortitas de arroz o maíz, Maíz dulce,
+Trigo sarraceno, Yuca o tapioca
+
+FRUTAS:
+Plátano, Manzana, Pera, Naranja, Mandarina, Kiwi, Fresa, Arándanos,
+Frambuesas, Uvas, Sandía, Melón, Piña, Mango, Papaya, Melocotón,
+Ciruela, Cerezas, Granada, Higo, Aguacate, Dátiles, Uvas pasas,
+Orejones, Coco fresco o rallado
+
+VERDURAS Y HORTALIZAS:
+Brócoli, Espinacas, Lechuga, Canónigos, Rúcula, Tomate, Cebolla,
+Ajo, Zanahoria, Calabacín, Berenjena, Pimiento rojo, Pimiento verde,
+Pimiento amarillo, Coliflor, Judías verdes, Espárragos verdes o
+blancos, Champiñones y setas, Pepino, Apio, Puerro, Alcachofas,
+Calabaza, Remolacha, Acelgas
+
+FRUTOS SECOS Y SEMILLAS:
+Nueces peladas, Almendras, Anacardos, Pistachos, Cacahuetes,
+Avellanas, Nueces de Brasil, Semillas de chía, Semillas de lino,
+Semillas de calabaza, Semillas de girasol, Semillas de sésamo, Crema
+de cacahuete, Crema de almendras, Tahini
+
+GRASAS Y CONDIMENTOS:
+Aceite de oliva virgen extra, Aceite de coco, Mantequilla, Sal
+marina o sal yodada, Pimienta negra, Cúrcuma, Canela, Cacao puro en
+polvo desgrasado
+
+BEBIDAS:
+Agua mineral, Café, Té verde
+
+DEPORTIVOS (revisar relevancia según perfil de pacientes):
+Proteína de suero de leche, Caseína micelar, Creatina monohidrato,
+Maltodextrina o Ciclodextrina, Geles deportivos de carbohidratos,
+Bebida isotónica
+
+Acción: cruzar con FOOD_DB actual (comando consola) para detectar
+huecos reales antes de añadir. Tomar decisión sobre fuente de datos
+(BEDCA web, USDA, etc.) y nivel de detalle de los suplementos
+deportivos. NO arrancar 1.3 hasta cerrar BUG-001 y BUG-002.
+Estado: pendiente, bloqueado por BUG-001 y BUG-002.
+
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
