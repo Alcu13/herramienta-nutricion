@@ -9546,10 +9546,11 @@ function useRecipeInMeal(dtId, mealId, opt, recipeId) {
     var food=(typeof FOOD_DB!=='undefined')?FOOD_DB.find(function(f){ return f.n===ing.name; }):null;
     var fk=food?food.kcal:ing.kcal, fp=food?food.p:ing.p, fc=food?food.c:ing.c, fg=food?food.g:ing.g;
     var f=ing.grams/100;
+    var _ch=Math.round(fc*f*10)/10, _gr=Math.round(fg*f*10)/10;
     meal.options[opt].push({fid:++_foodIdCounter,name:ing.name,grams:ing.grams,
       measure:(typeof medida==='function')?medida(ing.name,ing.grams):'',
       kcal:Math.round(fk*f*10)/10, prot:Math.round(fp*f*10)/10,
-      ch:Math.round(fc*f*10)/10,   gras:Math.round(fg*f*10)/10});
+      ch:_ch, gras:_gr, carbs:_ch, fat:_gr});
   });
   document.getElementById('recipe-picker-modal').style.display='none';
   renderPlanTab();
