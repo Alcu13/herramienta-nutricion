@@ -6,34 +6,6 @@ diagnóstico y commit, en el orden acordado con el mentor.
 
 ## Bugs
 
-### BUG-003 — Aceite de oliva no suma macros ni calorías
-Detectado: pruebas post-BUG-002.
-Síntoma: al añadir "aceite de oliva" como alimento manual en una
-opción del plan, los macros y kcal de ese alimento no se suman al
-total de la opción. Pendiente confirmar si ocurre con otros alimentos
-o solo con aceite de oliva específicamente.
-Hipótesis preliminar (NO investigada aún): el alimento puede no estar
-en FOOD_DB con la grafía exacta, o existir pero con datos
-nutricionales incompletos (kcal y macros faltantes), o tener algún
-campo numérico almacenado como string que rompe la suma.
-Severidad: clínica. Cualquier alimento que no suma falsea el total
-de la opción.
-Estado: pendiente, prioridad alta.
-
-### BUG-004 — Modificar gramos de un ingrediente de receta no actualiza el total
-Detectado: pruebas post-BUG-002.
-Síntoma: tras añadir una receta a una opción, cambiar los gramos de
-cualquiera de sus ingredientes desde la interfaz NO recalcula el
-total de la opción. Los alimentos manuales sí lo recalculan al
-cambiar gramos.
-Hipótesis preliminar (NO investigada aún): el handler de cambio de
-gramos puede estar enganchado solo a alimentos manuales, no a
-ingredientes provenientes de receta; o el evento se dispara pero no
-recalcula los macros derivados del nuevo peso.
-Severidad: clínica. El nutricionista ajusta gramos durante la
-consulta y necesita ver el total actualizado en tiempo real.
-Estado: pendiente, prioridad alta.
-
 ## Mejoras / housekeeping
 
 ### TASK-002 — Documentar el colapso de outputs de Claude Code en CLAUDE.md
@@ -164,6 +136,40 @@ severidad y estado. Cerrar una entrada = mover a una sección
 "## Cerrados" al final con su commit asociado.
 
 ## Cerrados
+
+### BUG-004 — Modificar gramos de un ingrediente de receta no actualiza el total
+Detectado: pruebas post-BUG-002.
+Síntoma: tras añadir una receta a una opción, cambiar los gramos de
+cualquiera de sus ingredientes desde la interfaz NO recalcula el
+total de la opción. Los alimentos manuales sí lo recalculan al
+cambiar gramos.
+Hipótesis preliminar (NO investigada aún): el handler de cambio de
+gramos puede estar enganchado solo a alimentos manuales, no a
+ingredientes provenientes de receta; o el evento se dispara pero no
+recalcula los macros derivados del nuevo peso.
+Severidad: clínica. El nutricionista ajusta gramos durante la
+consulta y necesita ver el total actualizado en tiempo real.
+Estado: cerrado como falso positivo — no reproducible en sesión
+limpia tras commits c9e840f (BUG-002) y 0ad3d2e (BUG-001). Probable
+arrastre de estado intermedio durante las pruebas post-fix de ayer.
+No se modificó código.
+
+### BUG-003 — Aceite de oliva no suma macros ni calorías
+Detectado: pruebas post-BUG-002.
+Síntoma: al añadir "aceite de oliva" como alimento manual en una
+opción del plan, los macros y kcal de ese alimento no se suman al
+total de la opción. Pendiente confirmar si ocurre con otros alimentos
+o solo con aceite de oliva específicamente.
+Hipótesis preliminar (NO investigada aún): el alimento puede no estar
+en FOOD_DB con la grafía exacta, o existir pero con datos
+nutricionales incompletos (kcal y macros faltantes), o tener algún
+campo numérico almacenado como string que rompe la suma.
+Severidad: clínica. Cualquier alimento que no suma falsea el total
+de la opción.
+Estado: cerrado como falso positivo — no reproducible en sesión
+limpia tras commits c9e840f (BUG-002) y 0ad3d2e (BUG-001). Probable
+arrastre de estado intermedio durante las pruebas post-fix de ayer.
+No se modificó código.
 
 ### BUG-002 — "Desde receta" no rellena ch ni gras en macros de opción
 Detectado: tras cerrar 1.2.
