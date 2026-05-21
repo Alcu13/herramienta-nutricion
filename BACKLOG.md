@@ -6,19 +6,6 @@ diagnóstico y commit, en el orden acordado con el mentor.
 
 ## Bugs
 
-### BUG-001 — Macros por día tipo idénticos en todos los días (Excel)
-Detectado: tras cerrar 1.2.
-Síntoma: en "OBJETIVOS NUTRICIONALES POR DÍA TIPO" del Excel, las
-columnas CH (149g), PROT (144g) y GRAS (72g) son idénticas en los 5
-días tipo, mientras que KCAL OBJETIVO sí varía (3247, 3498, 4000,
-3608, 3106). Aritmética no cuadra: 149·4 + 144·4 + 72·9 = 1820 kcal,
-muy por debajo del GET de cualquier día.
-Hipótesis: los hidratos no se recalculan por día contra el GET
-correspondiente; el motor calcula los macros una sola vez y los
-aplica a todos los días.
-Severidad: clínica. Afecta la periodización real del plan.
-Estado: pendiente.
-
 ### BUG-002 — "Desde receta" no rellena ch ni gras en macros de opción
 Detectado: tras cerrar 1.2.
 Síntoma: al añadir una receta con varios alimentos a una opción del
@@ -122,6 +109,21 @@ huecos reales antes de añadir. Tomar decisión sobre fuente de datos
 deportivos. NO arrancar 1.3 hasta cerrar BUG-001 y BUG-002.
 Estado: pendiente, bloqueado por BUG-001 y BUG-002.
 
+### TASK-005 — Limpiar inicialización de dt.targets.{prot,gras,ch} en JSON load
+Detectado: durante el diagnóstico de BUG-001.
+La carga inicial del JSON (líneas 4380-4383 de Procesador.html) escribe
+dt.targets.{prot,gras,ch} con multiplicadores 1.8/0.9 g/kg (o 2.0/1.0
+si el nombre del día contiene "entreno"/"entren"/"deport") sobre un
+TDEE aproximado común. Tras el arreglo de BUG-001, nadie consume esas
+claves para macros — exportarExcel ahora usa calcTargetMacrosFromGkg.
+Pero su inicialización sigue ahí y puede confundir a futuros lectores
+o consumidores accidentales.
+Acción: verificar primero que ninguna otra parte del código consume
+dt.targets.{prot,gras,ch}; eliminar la inicialización o reemplazarla
+por un wrapper que llame a la lógica nueva.
+Riesgo: bajo (deuda técnica, no funcional).
+Estado: pendiente.
+
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
@@ -129,6 +131,19 @@ severidad y estado. Cerrar una entrada = mover a una sección
 "## Cerrados" al final con su commit asociado.
 
 ## Cerrados
+
+### BUG-001 — Macros por día tipo idénticos en todos los días (Excel)
+Detectado: tras cerrar 1.2.
+Síntoma: en "OBJETIVOS NUTRICIONALES POR DÍA TIPO" del Excel, las
+columnas CH (149g), PROT (144g) y GRAS (72g) son idénticas en los 5
+días tipo, mientras que KCAL OBJETIVO sí varía (3247, 3498, 4000,
+3608, 3106). Aritmética no cuadra: 149·4 + 144·4 + 72·9 = 1820 kcal,
+muy por debajo del GET de cualquier día.
+Hipótesis: los hidratos no se recalculan por día contra el GET
+correspondiente; el motor calcula los macros una sola vez y los
+aplica a todos los días.
+Severidad: clínica. Afecta la periodización real del plan.
+Estado: cerrado — commit 0ad3d2e.
 
 ### TASK-001 — Versionar PIECE-1-SPEC.md y PIECE-2-SPEC.md
 Detectado: tras commit 5a1a5d1.
