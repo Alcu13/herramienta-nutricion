@@ -129,6 +129,32 @@ commit aislado.
 Estado: pendiente, prioridad MEDIA (deuda técnica activa que ya ha
 producido al menos un bug — BUG-002).
 
+### TASK-007 — Scraper BEDCA + integración en Biblioteca (pieza grande)
+Detectado: discusión post-cierre de BUG-003/004.
+La herramienta actualmente vive con FOOD_DB poblada a mano. Existe un
+scraper en proyecto separado (scraper_alimentos_es.py, ver nota inicial
+del CLAUDE.md) que actualmente recoge Open Food Facts y Mercadona a
+SQLite. Para una herramienta clínica seria a medio plazo, conviene:
+- Extender el scraper para incorporar BEDCA (Base de Datos Española de
+  Composición de Alimentos), fuente oficial sin API pública (descarga
+  del dataset).
+- Decidir e implementar cómo se integran esos datos en Procesador.html:
+  posiblemente como SQLite vía sql.js consultable desde la Biblioteca,
+  con un buscador BEDCA similar al de Open Food Facts ya existente, y
+  un botón "añadir a mi base" que escriba en FOOD_DB para mantener la
+  coherencia con la arquitectura post-1.1 (FOOD_DB como fuente única
+  del plan).
+- Verificar end-to-end: buscar BEDCA → añadir a FOOD_DB → usar en
+  plan → exportar a Excel.
+
+Estimación realista: 2 a 4 sesiones de trabajo bien hecho, no horas.
+Pospuesto explícitamente para después del primer paciente real. No
+arrancar mientras haya pacientes activos sin un calendario que admita
+varios días de trabajo en zona crítica.
+
+Estado: pendiente, prioridad ALTA a medio plazo, BLOQUEADA hasta
+después de validación con primer paciente real.
+
 ---
 Notación: cada entrada lleva su id (BUG-NNN o TASK-NNN), fecha o
 referencia de detección, síntoma observable, hipótesis si la hay,
