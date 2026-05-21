@@ -5318,16 +5318,25 @@ async function exportarExcel() {
       c.value=h; c.fill=fill('#1a3a5c'); c.font=font(true,'#ffffff',10); c.alignment=align('center','middle'); c.border=border();
     });
 
+    // Sync GET → kcal targets (always compute per-day-type GET)
+    state.dayTypes.forEach(dt => {
+      if (!dt.getActivities) dt.getActivities = initGETActivities(dt);
+      recalcGET(dt);
+      if (!dt.targets) dt.targets = {};
+      dt.targets.kcal = (dt.getOverride || dt._cachedGET || 0) + getObjAdjustment();
+    });
+
     state.dayTypes.forEach((dt, dti) => {
+      const macro = calcTargetMacrosFromGkg(dt);
       const r2 = rth+1+dti; wsCover.getRow(r2).height = 18;
       const rowBg = dti%2===0?'#f8fffe':'#eaf2ec';
       sc(wsCover,r2,1,'',rowBg);
       sc(wsCover,r2,2,dt.name,rowBg,'#1e2820',true,11,'left');
       sc(wsCover,r2,3,dt.days.join(', '),rowBg,'#6b7b70',false,10);
-      sc(wsCover,r2,4,dt.targets.kcal||'—',rowBg,'#1e2820',true,11,'center');
-      sc(wsCover,r2,5,dt.targets.ch?dt.targets.ch+'g':'—',rowBg,'#1e2820',false,10,'center');
-      sc(wsCover,r2,6,dt.targets.prot?dt.targets.prot+'g':'—',rowBg,'#1e2820',false,10,'center');
-      sc(wsCover,r2,7,dt.targets.gras?dt.targets.gras+'g':'—',rowBg,'#1e2820',false,10,'center');
+      sc(wsCover,r2,4,macro.kcal||'—',rowBg,'#1e2820',true,11,'center');
+      sc(wsCover,r2,5,macro.ch?macro.ch+'g':'—',rowBg,'#1e2820',false,10,'center');
+      sc(wsCover,r2,6,macro.prot?macro.prot+'g':'—',rowBg,'#1e2820',false,10,'center');
+      sc(wsCover,r2,7,macro.fat?macro.fat+'g':'—',rowBg,'#1e2820',false,10,'center');
     });
 
     // ══ SHEET PER DAY TYPE ═══════════════════════════════════
@@ -5358,7 +5367,8 @@ async function exportarExcel() {
       ws.mergeCells('A3:H3'); ws.getRow(3).height=20;
       const dtSub = ws.getCell('A3');
       const tg = dt.targets;
-      dtSub.value = tg.kcal ? `  Objetivo: ${tg.kcal} kcal  ·  CH: ${tg.ch}g  ·  PROT: ${tg.prot}g  ·  GRAS: ${tg.gras}g` : '  ⚠ Define los objetivos calóricos en la herramienta antes de exportar';
+      const macro = calcTargetMacrosFromGkg(dt);
+      dtSub.value = macro.kcal ? `  Objetivo: ${macro.kcal} kcal  ·  CH: ${macro.ch}g  ·  PROT: ${macro.prot}g  ·  GRAS: ${macro.fat}g` : '  ⚠ Define los objetivos calóricos en la herramienta antes de exportar';
       dtSub.fill=fill('#2a4e38'); dtSub.font=font(false,'#ffffff',11,true); dtSub.alignment=align('left','middle');
 
       ws.mergeCells('A4:H4'); ws.getRow(4).height=14;
