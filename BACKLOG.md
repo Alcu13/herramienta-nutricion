@@ -21,13 +21,6 @@ separate terminal, or by expanding manually with ctrl+o. Never approve
 critical decisions based on collapsed output."
 Estado: pendiente.
 
-### TASK-003 — Verificar en GitHub que los commits limpios no llevan Co-Authored-By
-Detectado: sesión de verificación de coautoría, 2026-05-20.
-Al primer push, comprobar en la interfaz web de GitHub que los commits
-3fae597, 4aefee6 y 3d83752 no muestran coautoría en el cuerpo público.
-Si alguno la llevara, enmendar antes de cerrar el push.
-Estado: pendiente (bloqueado hasta el primer push).
-
 ### TASK-005 — Limpiar inicialización de dt.targets.{prot,gras,ch} en JSON load
 Detectado: durante el diagnóstico de BUG-001.
 La carga inicial del JSON (líneas 4380-4383 de Procesador.html) escribe
@@ -94,6 +87,18 @@ severidad y estado. Cerrar una entrada = mover a una sección
 "## Cerrados" al final con su commit asociado.
 
 ## Cerrados
+
+### TASK-003 — Verificar en GitHub que los commits limpios no llevan Co-Authored-By
+Detectado: sesión de verificación de coautoría, 2026-05-20.
+Al primer push, comprobar en la interfaz web de GitHub que los commits
+3fae597, 4aefee6 y 3d83752 no muestran coautoría en el cuerpo público.
+Si alguno la llevara, enmendar antes de cerrar el push.
+Estado: cerrado — verificado tras primer push (commit 73c5745).
+Los commits 3fae597, 4aefee6 y 3d83752 verificados en la interfaz
+web de GitHub: ninguno muestra línea Co-Authored-By en el cuerpo
+público. La regla del no-coautor (commit 3fae597) ha funcionado
+desde su grabación. Vercel reconstruyó el sitio público
+automáticamente y la herramienta funciona en producción.
 
 ### TASK-004 — Ampliar FOOD_DB con la lista clínica del nutricionista (1.3)
 Detectado: sesión de preparación del 1.3, 2026-05-21.
