@@ -88,6 +88,16 @@ Test de aceptación:
    página "cómo usar el plan" (sub-pieza 3.2), o evaluar un enfoque alternativo antes
    de invertir en el diseño de 3.1.
 
+**Estado: TODOS LOS TESTS PASADOS** (verificado 2026-05-28).
+`print-color-adjust: exact` funciona — colores conservados con "Gráficos de fondo"
+tanto activado como desactivado. No se necesita instrucción al usuario en 3.2.
+
+**Pendiente para 3.1/3.2:** el PDF generado con `window.print()` en Chrome incluye
+cabecera y pie de página por defecto (fecha, título "Herramienta Nutricionista · Privado",
+ruta `file:///...` y número de página). Deben ocultarse para el documento del paciente.
+Solución: añadir `@page { margin: 0; }` en el bloque `@media print`, y gestionar
+márgenes del contenido desde el propio HTML del overlay.
+
 ---
 
 ### 3.1 — Rediseño visual del plan (núcleo de valor)
