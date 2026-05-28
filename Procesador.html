@@ -5102,6 +5102,64 @@ function renderGanttForDT(dt) {
        + '</div>';
 }
 
+function renderGanttForPDF(dt) {
+  var SH = 5, EH = 24;
+  var S = SH * 60, R = (EH - SH) * 60;
+  function tm(t) { if (!t) return null; var p = t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
+  function pct(min) { return Math.max(0, Math.min(100, (min - S) / R * 100)); }
+
+  var sessions = (dt.sessions || []).filter(function(s) {
+    return (s.type === 'entrenamiento' || s.type === 'competicion') && s.startTime && s.duration;
+  });
+  var meals = (dt.meals || []).filter(function(m) { return m.time; });
+
+  if (!sessions.length && !meals.length) return '';
+
+  var typeColors = { entrenamiento: '#52B788', competicion: '#E76F51' };
+
+  var grid = '';
+  for (var h = SH; h <= EH; h += 2) {
+    var lp = pct(h * 60).toFixed(2);
+    grid += '<div style="position:absolute;left:' + lp + '%;top:0;height:100%;width:1px;background:rgba(0,0,0,.06)"></div>'
+          + '<span style="position:absolute;left:' + lp + '%;top:2px;font-size:8px;color:#bbb;transform:translateX(-50%)">' + h + 'h</span>';
+  }
+
+  var bars = '';
+  sessions.forEach(function(s) {
+    var start = tm(s.startTime);
+    var dur = parseInt(s.duration) || 60;
+    var left = pct(start).toFixed(2);
+    var width = Math.max(pct(start + dur) - pct(start), 1.5).toFixed(2);
+    var color = typeColors[s.type] || '#888';
+    var icon = getSportIcon(s.type, s.name);
+    bars += '<div style="position:absolute;left:' + left + '%;width:' + width + '%;height:22px;top:14px;background:' + color + ';border-radius:5px;display:flex;align-items:center;padding:0 7px;box-sizing:border-box;overflow:hidden">'
+          + '<span style="font-size:10px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + icon + ' ' + (s.name || '') + '</span>'
+          + '</div>';
+  });
+
+  var divider = '<div style="position:absolute;left:0;right:0;top:42px;height:1px;background:rgba(0,0,0,.09)"></div>';
+
+  var markers = '';
+  meals.forEach(function(m) {
+    var min = tm(m.time);
+    if (min === null) return;
+    var left = pct(min).toFixed(2);
+    var emoji = (typeof MEAL_EMOJIS !== 'undefined' && MEAL_EMOJIS[m.type]) ? MEAL_EMOJIS[m.type] : '🍽️';
+    markers += '<div style="position:absolute;left:' + left + '%;top:44px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center">'
+             + '<span style="font-size:12px;line-height:1.1">' + emoji + '</span>'
+             + '<div style="width:1px;height:8px;background:rgba(0,0,0,.2)"></div>'
+             + '<span style="font-size:8px;font-weight:700;color:#777;white-space:nowrap">' + m.time + '</span>'
+             + '</div>';
+  });
+
+  return '<div style="background:#f7f8fa;border-left:1px solid #e8e8e8;border-right:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;padding:10px 14px 12px;margin-bottom:12px">'
+       + '<div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#aaa;margin-bottom:8px">📅 LÍNEA DE TIEMPO DEL DÍA</div>'
+       + '<div style="position:relative;height:82px;background:#fff;border-radius:8px;border:1px solid #eee;overflow:hidden">'
+       + grid + bars + divider + markers
+       + '</div>'
+       + '</div>';
+}
+
 function updateGanttForDT(dtId) {
   var dt = state.dayTypes.find(function(d) { return d.id === dtId; });
   if (!dt) return;
@@ -5927,6 +5985,17 @@ function abrirPDFOverlay() {
     + (email || 'tu nutricionista') + '.</p></div>'
     + '</div>';
 
+  var _sinHora = [];
+  state.dayTypes.forEach(function(dt) {
+    (dt.meals || []).forEach(function(m) {
+      if (!m.time) _sinHora.push('• ' + dt.name + ': ' + (m.type || 'Ingesta'));
+    });
+  });
+  if (_sinHora.length) {
+    alert('Faltan horas en estas comidas antes de generar el PDF:\n' + _sinHora.join('\n'));
+    return;
+  }
+
   var diasHtml = state.dayTypes.map(function(dt) {
     var mealsHtml = dt.meals.map(function(meal) {
       var colsHtml = ['A','B','C'].map(function(opt) {
@@ -5961,6 +6030,7 @@ function abrirPDFOverlay() {
       +   '<div class="pdf-day-name">' + dt.name + '</div>'
       +   '<div class="pdf-day-days">' + (dt.days || []).join(' · ') + '</div>'
       + '</div>'
+      + renderGanttForPDF(dt)
       + mealsHtml
       + '</div>';
   }).join('');
