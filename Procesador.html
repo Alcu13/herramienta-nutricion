@@ -202,6 +202,12 @@ hr.divider{border:none;border-top:1px solid var(--gray-l);margin:20px 0}
 .pdf-col-C .pdf-food-item{background:#f0e8f5}.pdf-col-C .pdf-food-item:nth-child(even){background:#f8f0fc}
 .pdf-food-name{flex:1;color:#1e2820;font-weight:500}
 .pdf-food-detail{font-size:11px;color:#6b7b70;white-space:nowrap;margin-left:8px}
+.pdf-cover{break-after:page;padding:20mm;text-align:center;display:flex;flex-direction:column;align-items:center}
+.pdf-how-to{break-after:page;padding:14mm 16mm}
+.pdf-how-to-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#1e2820;margin:0 0 20px;border-bottom:2px solid #3d6b4f;padding-bottom:10px}
+.pdf-how-to-section{margin-bottom:14px}
+.pdf-how-to-section h3{font-size:12px;font-weight:800;color:#3d6b4f;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px}
+.pdf-how-to-section p{font-size:12px;color:#1e2820;line-height:1.75;margin:0}
 @media print {
   body > *:not(#pdf-overlay) { display: none !important; }
   #pdf-overlay {
@@ -503,11 +509,33 @@ hr.divider{border:none;border-top:1px solid var(--gray-l);margin:20px 0}
       <div id="pdf-success" style="display:none;margin-top:16px;color:#27ae60;font-weight:700;font-size:14px">✅ PDFs generados. Revisa tu carpeta de Descargas.</div>
     </div>
 
-    <div class="export-card" style="margin-top:0;border-color:#7b5ea7;border-style:dashed">
-      <div class="export-title" style="color:#7b5ea7">PDF nuevo (prueba)</div>
-      <div class="export-sub">Motor HTML/CSS + overlay — validación técnica de la tubería antes del diseño visual. No reemplaza el PDF actual.</div>
+    <div class="export-card" style="margin-top:0;border-color:#7b5ea7">
+      <div class="export-title" style="color:#7b5ea7">PDF del paciente</div>
+      <div class="export-sub">Documento visual para entregar al paciente. Rellena los datos del nutricionista antes de generar.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;text-align:left">
+        <div>
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7b5ea7;display:block;margin-bottom:4px">Nombre del nutricionista</label>
+          <input id="pdf-nutri-nombre" type="text" placeholder="Ej: Sergio Alcubilla"
+            style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7b5ea7;display:block;margin-bottom:4px">Email de contacto</label>
+          <input id="pdf-nutri-email" type="email" placeholder="tu@email.com"
+            style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7b5ea7;display:block;margin-bottom:4px">Objetivo (texto para el paciente)</label>
+          <input id="pdf-nutri-objetivo" type="text" placeholder="Mantener el peso y el estado de forma"
+            style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7b5ea7;display:block;margin-bottom:4px">Frase de bienvenida</label>
+          <textarea id="pdf-nutri-bienvenida" rows="2" placeholder="Ej: ¡Hola! Aquí tienes tu plan personalizado..."
+            style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+        </div>
+      </div>
       <button class="export-btn" style="background:linear-gradient(135deg,#4a235a,#7b5ea7)" onclick="abrirPDFOverlay()">
-        🧪 Abrir overlay de prueba
+        📄 Generar PDF del paciente
       </button>
     </div>
   </div>
@@ -5267,6 +5295,9 @@ function renderExportTab() {
         ).join('')
       : '<span style="color:var(--gray);font-size:13px">No hay días tipo configurados.</span>';
   }
+  _pdfCfgLoad();
+  var _objInp = document.getElementById('pdf-nutri-objetivo');
+  if (_objInp && !_objInp.value && state.patient) _objInp.value = _pdfDeriveObjetivo();
 }
 
 // ─ EXCEL EXPORT (ExcelJS) ────────────────────────────────────
@@ -5852,6 +5883,50 @@ function abrirPDFOverlay() {
   }
   var nombre = (state.patient.paciente || {}).nombre || 'Paciente';
 
+  var nutri      = (document.getElementById('pdf-nutri-nombre')     || {}).value || '';
+  var email      = (document.getElementById('pdf-nutri-email')      || {}).value || '';
+  var objetivo   = (document.getElementById('pdf-nutri-objetivo')   || {}).value || _pdfDeriveObjetivo();
+  var bienvenida = (document.getElementById('pdf-nutri-bienvenida') || {}).value || '';
+  _pdfCfgSave(nutri, email);
+
+  var fecha = new Date().toLocaleDateString('es-ES', {day:'numeric', month:'long', year:'numeric'});
+
+  var portadaHtml =
+    '<div class="pdf-cover">'
+    + '<div style="background:#1a3a5c;color:#fff;border-radius:16px;padding:28px 40px;margin-bottom:28px;max-width:620px;width:100%">'
+    +   '<div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.65;margin-bottom:12px">Plan Nutricional Personalizado</div>'
+    +   '<div style="font-size:40px;font-weight:700;margin-bottom:10px">' + nombre + '</div>'
+    +   '<div style="font-size:16px;opacity:.9;font-style:italic">' + objetivo + '</div>'
+    + '</div>'
+    + (bienvenida
+        ? '<div style="font-size:14px;color:#3d6b4f;font-style:italic;max-width:520px;line-height:1.8;margin-bottom:28px;padding:16px 20px;background:#eaf2ec;border-radius:12px;text-align:left">'
+          + bienvenida + '</div>'
+        : '')
+    + '<div style="font-size:12px;color:#6b7b70;border-top:1px solid #e0e0e0;padding-top:18px;max-width:520px;width:100%;text-align:left">'
+    +   '<div style="margin-bottom:4px">📅 ' + fecha + '</div>'
+    +   (nutri ? '<div style="margin-bottom:4px">👤 ' + nutri + '</div>' : '')
+    +   (email ? '<div>✉ ' + email + '</div>' : '')
+    + '</div>'
+    + '</div>';
+
+  var comoUsarHtml =
+    '<div class="pdf-how-to">'
+    + '<div class="pdf-how-to-title">Cómo usar tu plan</div>'
+    + '<div class="pdf-how-to-section"><h3>Qué son los días tipo</h3>'
+    + '<p>Tu plan está organizado en "días tipo", no en días de la semana fijos. Cada día tipo corresponde a una combinación de actividad (por ejemplo, un día de trabajo y entrenamiento, o un día solo de descanso). En la cabecera de cada día tipo verás a qué días de la semana corresponde. Identifica qué te toca hacer cada día y usa el día tipo que corresponda.</p></div>'
+    + '<div class="pdf-how-to-section"><h3>Las tres opciones (A, B y C)</h3>'
+    + '<p>Cada comida tiene tres opciones equivalentes. Elige la que más te apetezca cada día — están pensadas para aportar lo mismo, así que puedes ir alternando para no aburrirte. No tienes que seguir siempre la misma.</p></div>'
+    + '<div class="pdf-how-to-section"><h3>Si un día cambia tu actividad</h3>'
+    + '<p>Si un día concreto entrenas cuando no tocaba, o descansas cuando ibas a entrenar, usa el día tipo que corresponda a lo que realmente vas a hacer ese día, no al que marca el calendario.</p></div>'
+    + '<div class="pdf-how-to-section"><h3>Si te falta un alimento</h3>'
+    + '<p>Si no tienes a mano un alimento o no te apetece, puedes sustituirlo por otro parecido del mismo grupo (una fruta por otra fruta, una fuente de proteína por otra). Si tienes dudas sobre una sustitución, escríbeme.</p></div>'
+    + '<div class="pdf-how-to-section"><h3>Las cantidades</h3>'
+    + '<p>Cada alimento lleva su cantidad en gramos y una equivalencia aproximada en medidas caseras (tazas, cucharadas, piezas). Las medidas caseras son orientativas; si puedes pesar, mejor, pero no es imprescindible.</p></div>'
+    + '<div class="pdf-how-to-section"><h3>Cualquier duda</h3>'
+    + '<p>Estoy a tu disposición para cualquier pregunta sobre el plan. Escríbeme a '
+    + (email || 'tu nutricionista') + '.</p></div>'
+    + '</div>';
+
   var diasHtml = state.dayTypes.map(function(dt) {
     var mealsHtml = dt.meals.map(function(meal) {
       var colsHtml = ['A','B','C'].map(function(opt) {
@@ -5902,7 +5977,7 @@ function abrirPDFOverlay() {
     +   '<button onclick="cerrarPDFOverlay()" style="padding:8px 20px;background:#e0e0e0;'
     +     'border:none;border-radius:8px;font-weight:700;cursor:pointer">✕ Cerrar</button>'
     + '</div>'
-    + '<div class="pdf-content">' + diasHtml + '</div>';
+    + '<div class="pdf-content">' + portadaHtml + comoUsarHtml + diasHtml + '</div>';
 
   document.body.appendChild(el);
 }
@@ -5910,6 +5985,35 @@ function abrirPDFOverlay() {
 function cerrarPDFOverlay() {
   var el = document.getElementById('pdf-overlay');
   if (el) el.remove();
+}
+
+// ─ PDF CONFIG ────────────────────────────────────────────────
+function _pdfDeriveObjetivo() {
+  var obj = ((state.patient || {}).objetivos || {}).principal || '';
+  var o = obj.toLowerCase();
+  if (o.includes('pérdida')||o.includes('perder')||o.includes('adelgaz')) return 'Perder peso de forma saludable';
+  if (o.includes('ganancia')||o.includes('ganar')||o.includes('volumen')||o.includes('masa')) return 'Ganar músculo y masa corporal';
+  if (o.includes('composición')||o.includes('recomposición')) return 'Mejorar la composición corporal';
+  if (o.includes('rendimiento')) return 'Mejorar el rendimiento deportivo';
+  return 'Mantener el peso y el estado de forma';
+}
+
+function _pdfCfgLoad() {
+  try {
+    var nombre = localStorage.getItem('pdf_nutri_nombre') || '';
+    var email  = localStorage.getItem('pdf_nutri_email')  || '';
+    var n = document.getElementById('pdf-nutri-nombre');
+    var e = document.getElementById('pdf-nutri-email');
+    if (n && !n.value) n.value = nombre;
+    if (e && !e.value) e.value = email;
+  } catch(err) { /* localStorage no disponible — continúa sin él */ }
+}
+
+function _pdfCfgSave(nombre, email) {
+  try {
+    localStorage.setItem('pdf_nutri_nombre', nombre || '');
+    localStorage.setItem('pdf_nutri_email',  email  || '');
+  } catch(err) { /* noop */ }
 }
 
 // ─ NAVIGATION ────────────────────────────────────────────────
