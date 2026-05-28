@@ -180,6 +180,28 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);mi
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sage);background:#fff}
 hr.divider{border:none;border-top:1px solid var(--gray-l);margin:20px 0}
 @media(max-width:700px){.profile-grid{grid-template-columns:1fr 1fr}.week-grid{grid-template-columns:repeat(7,1fr);gap:4px}.meal-options{grid-template-columns:1fr}.option-col{border-right:none;border-bottom:1px solid var(--border)}.option-col:last-child{border-bottom:none}}
+@page{size:A4 landscape;margin:0}
+/* ── PDF NUEVO motor 3.1 ─────────────────────────────────── */
+.pdf-content{padding:12mm 16mm;font-family:'Nunito',sans-serif}
+.pdf-day{margin-bottom:24px;break-before:page}
+.pdf-day:first-child{break-before:auto}
+.pdf-day-header{padding:10px 16px;border-radius:10px 10px 0 0;color:#fff;margin-bottom:12px}
+.pdf-day-name{font-size:18px;font-weight:700}
+.pdf-day-days{font-size:11px;opacity:.85;margin-top:2px}
+.pdf-meal-block{margin-bottom:14px;break-inside:avoid}
+.pdf-meal-header{display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:2px solid #e0e0e0;margin-bottom:7px}
+.pdf-meal-type{font-size:13px;font-weight:800;color:#1e2820;text-transform:uppercase;letter-spacing:.5px}
+.pdf-meal-time{font-size:12px;color:#6b7b70}
+.pdf-options-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pdf-option-col{border-radius:0 0 8px 8px;overflow:hidden}
+.pdf-opt-header{padding:5px 10px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#fff}
+.pdf-opt-A{background:#1565c0}.pdf-opt-B{background:#6e2f04}.pdf-opt-C{background:#4a235a}
+.pdf-food-item{display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;font-size:12px}
+.pdf-col-A .pdf-food-item{background:#d6eaf8}.pdf-col-A .pdf-food-item:nth-child(even){background:#eaf4fd}
+.pdf-col-B .pdf-food-item{background:#fdebd0}.pdf-col-B .pdf-food-item:nth-child(even){background:#fef5e7}
+.pdf-col-C .pdf-food-item{background:#f0e8f5}.pdf-col-C .pdf-food-item:nth-child(even){background:#f8f0fc}
+.pdf-food-name{flex:1;color:#1e2820;font-weight:500}
+.pdf-food-detail{font-size:11px;color:#6b7b70;white-space:nowrap;margin-left:8px}
 @media print {
   body > *:not(#pdf-overlay) { display: none !important; }
   #pdf-overlay {
@@ -5825,16 +5847,47 @@ async function generarTodosPDF() {
 // ─ PDF NUEVO — MOTOR HTML/OVERLAY (sub-pieza 3.0) ──────────
 function abrirPDFOverlay() {
   if (!state.patient || !state.dayTypes.length) {
-    alert('Carga los datos del paciente y configura al menos un día tipo antes de probar el overlay.');
+    alert('Carga los datos del paciente y configura al menos un día tipo antes de generar el PDF.');
     return;
   }
   var nombre = (state.patient.paciente || {}).nombre || 'Paciente';
-  var dt = state.dayTypes[0];
-  var mealList = dt.meals.map(function(m) {
-    return '<li style="margin:4px 0">'
-      + (m.type || 'Ingesta')
-      + (m.time ? '  ·  ' + m.time : '')
-      + '</li>';
+
+  var diasHtml = state.dayTypes.map(function(dt) {
+    var mealsHtml = dt.meals.map(function(meal) {
+      var colsHtml = ['A','B','C'].map(function(opt) {
+        var foods = (meal.options[opt]||[]).filter(function(f){ return f.name || f.grams; });
+        var foodsHtml = foods.length
+          ? foods.map(function(f) {
+              var m = f.measure || medida(f.name, f.grams) || '—';
+              var detail = (f.grams ? f.grams + ' g' : '') + (m && m !== '—' ? ' · ' + m : '');
+              return '<div class="pdf-food-item">'
+                + '<span class="pdf-food-name">' + (f.name || '—') + '</span>'
+                + '<span class="pdf-food-detail">' + detail + '</span>'
+                + '</div>';
+            }).join('')
+          : '<div class="pdf-food-item"><span class="pdf-food-name" style="color:#aaa;font-style:italic">Sin alimentos</span></div>';
+        return '<div class="pdf-option-col pdf-col-' + opt + '">'
+          + '<div class="pdf-opt-header pdf-opt-' + opt + '">OPCIÓN ' + opt + '</div>'
+          + foodsHtml
+          + '</div>';
+      }).join('');
+
+      return '<div class="pdf-meal-block">'
+        + '<div class="pdf-meal-header">'
+        +   '<span class="pdf-meal-type">' + (meal.type || 'Ingesta') + '</span>'
+        +   (meal.time ? '<span class="pdf-meal-time">' + meal.time + '</span>' : '')
+        + '</div>'
+        + '<div class="pdf-options-grid">' + colsHtml + '</div>'
+        + '</div>';
+    }).join('');
+
+    return '<div class="pdf-day">'
+      + '<div class="pdf-day-header" style="background:' + (dt.color || '#3d6b4f') + '">'
+      +   '<div class="pdf-day-name">' + dt.name + '</div>'
+      +   '<div class="pdf-day-days">' + (dt.days || []).join(' · ') + '</div>'
+      + '</div>'
+      + mealsHtml
+      + '</div>';
   }).join('');
 
   var el = document.createElement('div');
@@ -5843,32 +5896,13 @@ function abrirPDFOverlay() {
   el.innerHTML =
     '<div class="pdf-controls" style="position:sticky;top:0;background:#f0e6f8;padding:12px 20px;'
     + 'display:flex;gap:12px;align-items:center;border-bottom:2px solid #7b5ea7">'
-    +   '<span style="font-weight:700;color:#4a235a;flex:1">🧪 Overlay de prueba — PDF nuevo</span>'
+    +   '<span style="font-weight:700;color:#4a235a;flex:1">📄 PDF del paciente — ' + nombre + '</span>'
     +   '<button onclick="window.print()" style="padding:8px 20px;background:#4a235a;color:#fff;'
     +     'border:none;border-radius:8px;font-weight:700;cursor:pointer">🖨️ Imprimir / Guardar PDF</button>'
     +   '<button onclick="cerrarPDFOverlay()" style="padding:8px 20px;background:#e0e0e0;'
     +     'border:none;border-radius:8px;font-weight:700;cursor:pointer">✕ Cerrar</button>'
     + '</div>'
-    + '<div style="max-width:800px;margin:40px auto;padding:0 32px;font-family:Nunito,sans-serif">'
-    +   '<div style="background:#1a3a5c;color:#fff;padding:24px 32px;border-radius:16px;margin-bottom:32px">'
-    +     '<div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;'
-    +       'opacity:.7;margin-bottom:8px">Plan Nutricional Personalizado</div>'
-    +     '<div style="font-size:36px;font-weight:700">' + nombre + '</div>'
-    +   '</div>'
-    +   '<div style="background:#3d6b4f;color:#fff;padding:16px 24px;border-radius:12px;margin-bottom:24px">'
-    +     '<div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;'
-    +       'opacity:.8;margin-bottom:4px">Día tipo</div>'
-    +     '<div style="font-size:22px;font-weight:700">' + dt.name + '</div>'
-    +     '<div style="font-size:13px;opacity:.85;margin-top:4px">' + (dt.days || []).join(' · ') + '</div>'
-    +   '</div>'
-    +   '<div style="background:#eaf2ec;border-radius:12px;padding:20px 24px">'
-    +     '<div style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;'
-    +       'color:#3d6b4f;margin-bottom:12px">Ingestas del día</div>'
-    +     '<ul style="margin:0;padding-left:20px;color:#1e2820;font-size:15px;line-height:1.8">'
-    +     mealList
-    +     '</ul>'
-    +   '</div>'
-    + '</div>';
+    + '<div class="pdf-content">' + diasHtml + '</div>';
 
   document.body.appendChild(el);
 }
