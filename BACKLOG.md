@@ -54,6 +54,17 @@ commit aislado.
 Estado: pendiente, prioridad MEDIA (deuda técnica activa que ya ha
 producido al menos un bug — BUG-002).
 
+### PIEZA 3 — PDF del paciente (rediseño visual)
+Detectado: sesión de planificación 2026-05-28.
+Reescritura del motor de PDF a HTML/CSS + overlay a pantalla completa para lograr un
+documento visualmente rico orientado al paciente (Gantt de día tipo, tarjetas de comida
+con opciones A/B/C, portada, iconos SVG). La implementación actual (generarPDF /
+generarTodosPDF con jsPDF, líneas 5587-5806) se mantiene intacta y funcional hasta que
+el nuevo motor esté completo y probado.
+Mapa completo de sub-piezas (3.0 a 3.5) en PIECE-3-SPEC.md.
+Estado: planificada, lista para arrancar por 3.0. Prioridad media (mejora de entregable;
+no bloquea atención al primer paciente, que puede usar el PDF actual o el Excel).
+
 ### TASK-007 — Scraper BEDCA + integración en Biblioteca (pieza grande)
 Detectado: discusión post-cierre de BUG-003/004.
 La herramienta actualmente vive con FOOD_DB poblada a mano. Existe un
