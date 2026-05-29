@@ -6,6 +6,23 @@ diagnóstico y commit, en el orden acordado con el mentor.
 
 ## Bugs
 
+### BUG-005 — Solapamiento de marcadores en Gantt (comidas próximas <60 min)
+Detectado: durante ensayo del PDF de 3.4a, día tipo Trabajo + Calistenia.
+Síntoma: tres puntos de solapamiento visibles en pantalla y en PDF:
+- Media mañana 12:00 + Almuerzo 12:00 (misma hora exacta).
+- Almuerzo 12:00 + Pre-entreno 12:13 (13 min de separación).
+- Post-entreno 22:45 + Cena 23:00 (15 min de separación).
+Los marcadores se renderizan en su posición horaria exacta sin considerar el
+ancho visual del bloque, por lo que comidas próximas (<60 min) se solapan en
+pantalla y en PDF, pisando emojis y horas.
+Estrategia decidida (mentor): apilado vertical automático tipo Google Calendar.
+Umbral: 60 minutos. Dirección: hacia abajo (carriles crecientes).
+Afecta: renderGanttForPDF (pieza 3.3) y, pendiente de revisar,
+posiblemente también renderGanttForDT (planificador semanal).
+Severidad: visual/estética. No falsea datos, pero degrada legibilidad del PDF
+del paciente en días con comidas muy próximas.
+Estado: pendiente.
+
 ## Mejoras / housekeeping
 
 ### TASK-002 — Documentar el colapso de outputs de Claude Code en CLAUDE.md
