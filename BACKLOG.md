@@ -23,6 +23,21 @@ Severidad: visual/estética. No falsea datos, pero degrada legibilidad del PDF
 del paciente en días con comidas muy próximas.
 Estado: pendiente.
 
+### BUG-006 — Solapamiento de marcadores en Gantt del planificador semanal
+Detectado: durante diagnóstico de BUG-005, al verificar renderGanttForDT
+(líneas 5100-5113 aprox.).
+Síntoma: la función renderGanttForDT (del planificador semanal) usa exactamente
+el mismo patrón de top:44px fijo para todos los marcadores que
+renderGanttForPDF, sin lógica de carriles. Si dos comidas próximas (<60 min)
+se configuran en un día tipo, se solapan visualmente en la pestaña Semana.
+Estrategia: aplicar el mismo algoritmo de carriles que se diseñe para BUG-005
+(apilado vertical, umbral 60 min, dirección hacia abajo). Cuando se resuelva
+BUG-005, evaluar si se puede extraer una función común de asignación de
+carriles, o si se duplica la lógica deliberadamente.
+Severidad: visual, solo afecta a la vista interna del nutricionista (no al PDF
+del paciente).
+Estado: pendiente, posterior a BUG-005.
+
 ## Mejoras / housekeeping
 
 ### TASK-002 — Documentar el colapso de outputs de Claude Code en CLAUDE.md
