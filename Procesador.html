@@ -5124,7 +5124,7 @@ function renderGanttForDT(dt) {
 }
 
 function renderGanttForPDF(dt) {
-  var SH = 5, EH = 24;
+  var SH = 5, EH = 24, H = 28;
   var S = SH * 60, R = (EH - SH) * 60;
   function tm(t) { if (!t) return null; var p = t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
   function pct(min) { return Math.max(0, Math.min(100, (min - S) / R * 100)); }
@@ -5160,13 +5160,29 @@ function renderGanttForPDF(dt) {
 
   var divider = '<div style="position:absolute;left:0;right:0;top:42px;height:1px;background:rgba(0,0,0,.09)"></div>';
 
+  var sorted = meals.slice().sort(function(a, b) { return tm(a.time) - tm(b.time); });
+  var laneLastMin = [];
+  var mealLane    = [];
+  sorted.forEach(function(m) {
+    var min = tm(m.time);
+    var assigned = -1;
+    for (var l = 0; l < laneLastMin.length; l++) {
+      if (min - laneLastMin[l] >= 60) { assigned = l; laneLastMin[l] = min; break; }
+    }
+    if (assigned === -1) { assigned = laneLastMin.length; laneLastMin.push(min); }
+    mealLane.push(assigned);
+  });
+  var nLanes = Math.max(1, laneLastMin.length);
+  var containerH = Math.max(82, 44 + nLanes * H + 10);
+
   var markers = '';
-  meals.forEach(function(m) {
+  sorted.forEach(function(m, i) {
     var min = tm(m.time);
     if (min === null) return;
     var left = pct(min).toFixed(2);
+    var top  = 44 + mealLane[i] * H;
     var emoji = (typeof MEAL_EMOJIS !== 'undefined' && MEAL_EMOJIS[m.type]) ? MEAL_EMOJIS[m.type] : '🍽️';
-    markers += '<div style="position:absolute;left:' + left + '%;top:44px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center">'
+    markers += '<div style="position:absolute;left:' + left + '%;top:' + top + 'px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center">'
              + '<span style="font-size:12px;line-height:1.1">' + emoji + '</span>'
              + '<div style="width:1px;height:8px;background:rgba(0,0,0,.2)"></div>'
              + '<span style="font-size:8px;font-weight:700;color:#777;white-space:nowrap">' + m.time + '</span>'
@@ -5175,7 +5191,7 @@ function renderGanttForPDF(dt) {
 
   return '<div style="background:#f7f8fa;border-left:1px solid #e8e8e8;border-right:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;padding:10px 14px 12px;margin-bottom:12px">'
        + '<div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#aaa;margin-bottom:8px">📅 LÍNEA DE TIEMPO DEL DÍA</div>'
-       + '<div style="position:relative;height:82px;background:#fff;border-radius:8px;border:1px solid #eee;overflow:hidden">'
+       + '<div style="position:relative;height:' + containerH + 'px;background:#fff;border-radius:8px;border:1px solid #eee;overflow:hidden">'
        + grid + bars + divider + markers
        + '</div>'
        + '</div>';
